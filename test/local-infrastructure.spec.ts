@@ -51,4 +51,24 @@ describe('local infrastructure', () => {
     expect(healthcheck.test[1]).toContain('pg_isready');
     expect(healthcheck.retries).toBeGreaterThan(0);
   });
+
+  it('runs Redis 7', () => {
+    const config = loadComposeConfig();
+
+    expect(config.services.redis.image).toBe('redis:7-alpine');
+  });
+
+  it('publishes Redis only on localhost', () => {
+    const [port] = loadComposeConfig().services.redis.ports;
+
+    expect(port.host_ip).toBe('127.0.0.1');
+    expect(port.published).toBe('6379');
+    expect(port.target).toBe(6379);
+  });
+
+  it('checks Redis readiness with redis-cli ping', () => {
+    const healthcheck = loadComposeConfig().services.redis.healthcheck;
+
+    expect(healthcheck.test).toEqual(['CMD', 'redis-cli', 'ping']);
+  });
 });
