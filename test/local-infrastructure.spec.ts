@@ -71,4 +71,32 @@ describe('local infrastructure', () => {
 
     expect(healthcheck.test).toEqual(['CMD', 'redis-cli', 'ping']);
   });
+
+  it('runs Mailpit', () => {
+    const config = loadComposeConfig();
+
+    expect(config.services.mailpit.image).toBe('axllent/mailpit:v1.31.3');
+  });
+
+  it('publishes Mailpit SMTP and web UI only on localhost', () => {
+    const ports = loadComposeConfig().services.mailpit.ports;
+
+    const smtp = ports.find(
+      (element: { target: number }) => element.target === 1025,
+    );
+    expect(smtp.host_ip).toBe('127.0.0.1');
+    expect(smtp.published).toBe('1025');
+
+    const web = ports.find(
+      (element: { target: number }) => element.target === 8025,
+    );
+    expect(web.host_ip).toBe('127.0.0.1');
+    expect(web.published).toBe('8025');
+  });
+
+  it('checks Mailpit readiness with readyz', () => {
+    const healthcheck = loadComposeConfig().services.mailpit.healthcheck;
+
+    expect(healthcheck.test).toEqual(['CMD', '/mailpit', 'readyz']);
+  });
 });
