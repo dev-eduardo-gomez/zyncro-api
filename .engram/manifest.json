@@ -8,6 +8,14 @@
       "sessions": 3,
       "memories": 30,
       "prompts": 0
+    },
+    {
+      "id": "8475f015",
+      "created_by": "ofima",
+      "created_at": "2026-10-02T06:50:43.6383237Z",
+      "sessions": 3,
+      "memories": 5,
+      "prompts": 0
     }
   ]
 }
