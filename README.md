@@ -1,114 +1,143 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Zyncro API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend de **Zyncro**, un ERP financiero enfocado en automatizar Cuentas por Cobrar (AR), Cuentas por Pagar (AP) y Nómina. Construido con [NestJS](https://nestjs.com).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+La documentación de producto vive en [`docs/`](docs/).
 
-## Description
+## Requisitos
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Herramienta                    | Para qué                          |
+| ------------------------------ | --------------------------------- |
+| Node.js + npm                  | Ejecutar la API y los tests       |
+| Docker (con Docker Compose v2) | Levantar la infraestructura local |
 
-## Project setup
+## Arquitectura local
 
-```bash
-$ npm install
+La API corre **en tu máquina**; la infraestructura corre en contenedores con Docker Compose. Todos los puertos se publican solo en `127.0.0.1`, así que no son accesibles desde la red.
+
+```
+┌──────────────── tu máquina ────────────────┐
+│                                            │
+│   NestJS (npm run start:dev)               │
+│     │            │             │           │
+│     ▼            ▼             ▼           │
+│  127.0.0.1    127.0.0.1     127.0.0.1      │
+│   :15432        :6379         :1025        │
+│ ┌─────────┐  ┌─────────┐  ┌─────────────┐  │
+│ │Postgres │  │  Redis  │  │   Mailpit   │──┼─▶ UI web :8025
+│ │   16    │  │    7    │  │ (SMTP falso)│  │
+│ └─────────┘  └─────────┘  └─────────────┘  │
+│        contenedores (docker compose)       │
+└────────────────────────────────────────────┘
 ```
 
-## Compile and run the project
+| Servicio   | Imagen                    | Puerto local (default)     | Para qué                                          |
+| ---------- | ------------------------- | -------------------------- | ------------------------------------------------- |
+| `postgres` | `postgres:16-alpine`      | `15432` → `5432`           | Base de datos principal (fuente de verdad)        |
+| `redis`    | `redis:7-alpine`          | `6379` → `6379`            | Rate limiting y colas de trabajos (BullMQ)        |
+| `mailpit`  | `axllent/mailpit:v1.31.3` | `1025` (SMTP), `8025` (UI) | Atrapa los mails de desarrollo; nunca los entrega |
+
+Los tres servicios tienen **healthcheck**, así que `docker compose ps` muestra `(healthy)` cuando están listos para recibir conexiones.
+
+## Puesta en marcha
+
+### 1. Instalar dependencias
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### 2. Crear el archivo `.env`
 
 ```bash
-# unit tests
-$ npm run test
+# bash / Git Bash
+cp .env.example .env
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# PowerShell
+Copy-Item .env.example .env
 ```
 
-## Deployment
+`.env` está ignorado por Git: guardá ahí tus valores locales y nunca lo commitees.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Variable            | Obligatoria | Default | Uso                                  |
+| ------------------- | ----------- | ------- | ------------------------------------ |
+| `POSTGRES_DB`       | Sí          | —       | Nombre de la base de datos           |
+| `POSTGRES_USER`     | Sí          | —       | Usuario de PostgreSQL                |
+| `POSTGRES_PASSWORD` | Sí          | —       | Contraseña de PostgreSQL             |
+| `POSTGRES_PORT`     | No          | `15432` | Puerto de PostgreSQL en tu máquina   |
+| `REDIS_PORT`        | No          | `6379`  | Puerto de Redis en tu máquina        |
+| `MAILPIT_SMTP_PORT` | No          | `1025`  | Puerto SMTP de Mailpit en tu máquina |
+| `MAILPIT_UI_PORT`   | No          | `8025`  | Puerto de la UI web de Mailpit       |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+> La sintaxis es `CLAVE=valor`. Si un puerto choca con algo que ya tenés instalado (por ejemplo, un PostgreSQL local en `5432`), cambiá solo el valor en tu `.env`.
+
+### 3. Levantar la infraestructura
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker compose up -d --wait
+docker compose ps
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+`--wait` hace que el comando espere a que los healthchecks pasen. Los tres servicios deben decir `Up (healthy)`.
 
-## Observability
+### 4. Verificar cada servicio
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+```bash
+# PostgreSQL: debe responder "accepting connections"
+docker compose exec postgres sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+# Redis: debe responder PONG
+docker compose exec redis redis-cli ping
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+# Mailpit: abrí la bandeja en el navegador
+# http://127.0.0.1:8025
+```
 
-## Resources
+### 5. Levantar la API
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npm run start:dev
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Comandos de infraestructura
 
-## Support
+| Comando                             | Qué hace                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------- |
+| `docker compose up -d`              | Levanta todos los servicios en segundo plano                              |
+| `docker compose up -d <servicio>`   | Levanta solo uno (`postgres`, `redis`, `mailpit`)                         |
+| `docker compose ps`                 | Muestra el estado y el healthcheck de cada servicio                       |
+| `docker compose logs -f <servicio>` | Sigue los logs de un servicio                                             |
+| `docker compose stop`               | Detiene los contenedores sin borrarlos                                    |
+| `docker compose down`               | Borra los contenedores; **los datos de PostgreSQL se conservan**          |
+| `docker compose down -v`            | Borra contenedores **y volúmenes**: ⚠️ se pierden los datos de PostgreSQL |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Persistencia:** solo PostgreSQL usa un volumen (`postgres_data`). Redis y Mailpit guardan datos efímeros, que se pierden al recrear sus contenedores.
 
-## Stay in touch
+## Tests
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm test             # tests unitarios y de contrato
+npm run test:watch   # modo watch
+npm run test:cov     # cobertura
+npm run test:e2e     # tests end-to-end
+```
 
-## License
+`test/local-infrastructure.spec.ts` contiene los **tests de contrato** de la infraestructura: leen la configuración resuelta con `docker compose --env-file .env.example config` y verifican imágenes, puertos (solo en `127.0.0.1`), volúmenes y healthchecks. Necesitan el CLI de Docker disponible, pero no requieren los contenedores levantados ni tu `.env`.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Otros comandos
+
+| Comando              | Qué hace                   |
+| -------------------- | -------------------------- |
+| `npm run build`      | Compila a `dist/`          |
+| `npm run start:prod` | Ejecuta la build compilada |
+| `npm run lint`       | Lint con oxlint            |
+| `npm run format`     | Formatea con Prettier      |
+
+## Problemas frecuentes
+
+| Síntoma                                        | Causa probable                                                                                   | Solución                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `bind: ... address already in use` al levantar | El puerto ya está ocupado en tu máquina                                                          | Cambiá el puerto en `.env` (`POSTGRES_PORT`, `REDIS_PORT`, etc.) |
+| Cambiar un valor en `.env` no tiene efecto     | Sintaxis `CLAVE:valor` en vez de `CLAVE=valor`, o una variable exportada en tu shell que lo pisa | Usá `=`; revisá las variables de tu shell                        |
+| Un servicio queda en `(health: starting)`      | Todavía está arrancando                                                                          | Esperá unos segundos y volvé a correr `docker compose ps`        |
+| Un servicio queda `(unhealthy)`                | El healthcheck falla                                                                             | `docker compose logs <servicio>`                                 |
