@@ -16,6 +16,14 @@
       "sessions": 3,
       "memories": 5,
       "prompts": 0
+    },
+    {
+      "id": "b3ab3e14",
+      "created_by": "ofima",
+      "created_at": "2026-10-02T22:12:45.3780464Z",
+      "sessions": 2,
+      "memories": 3,
+      "prompts": 0
     }
   ]
 }
