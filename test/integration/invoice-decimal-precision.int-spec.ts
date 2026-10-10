@@ -7,29 +7,35 @@ process.loadEnvFile();
 describe('Invoice amount persistence', () => {
   let prisma: PrismaClient;
   const taxId = `TEST-${Date.now()}`;
+  let isDatabaseReady = false;
 
   beforeAll(async () => {
     prisma = new PrismaClient({
       adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
     });
 
-    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
+    isDatabaseReady = true;
   });
 
   afterAll(async () => {
-    await prisma.invoice.deleteMany({
-      where: {
-        customer: { taxId: { startsWith: taxId } },
-      },
-    });
+    try {
+      if (isDatabaseReady) {
+        await prisma.invoice.deleteMany({
+          where: {
+            customer: { taxId: { startsWith: taxId } },
+          },
+        });
 
-    await prisma.customer.deleteMany({
-      where: {
-        taxId: { startsWith: taxId },
-      },
-    });
-
-    await prisma.$disconnect();
+        await prisma.customer.deleteMany({
+          where: {
+            taxId: { startsWith: taxId },
+          },
+        });
+      }
+    } finally {
+      await prisma?.$disconnect();
+    }
   });
 
   it('rejects a second customer with the same taxId', async () => {
