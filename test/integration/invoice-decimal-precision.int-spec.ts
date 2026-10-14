@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client.js';
+import { existsSync } from 'node:fs';
 
-process.loadEnvFile();
+if (existsSync('.env')) process.loadEnvFile();
 
 describe('Invoice amount persistence', () => {
   let prisma: PrismaClient;
