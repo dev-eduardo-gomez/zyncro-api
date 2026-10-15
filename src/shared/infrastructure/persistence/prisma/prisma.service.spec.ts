@@ -27,4 +27,16 @@ describe('PrismaService', () => {
 
     expect(disconnect).toHaveBeenCalledOnce();
   });
+
+  it('rejects a missing DATABASE_URL', () => {
+    vi.stubEnv('DATABASE_URL', undefined);
+
+    expect(() => new PrismaService()).toThrow('DATABASE_URL is not set');
+  });
+
+  it('rejects an empty DATABASE_URL', () => {
+    vi.stubEnv('DATABASE_URL', '');
+
+    expect(() => new PrismaService()).toThrow('DATABASE_URL is empty');
+  });
 });
