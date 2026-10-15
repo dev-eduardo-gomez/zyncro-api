@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
+import { existsSync } from 'node:fs';
 
 async function bootstrap() {
+  if (existsSync('.env')) process.loadEnvFile();
+
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,
   });

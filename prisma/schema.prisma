@@ -1,0 +1,52 @@
+generator client {
+    provider = "prisma-client"
+    output = "../src/generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+enum InvoiceStatus {
+    PENDING
+    PAID
+    OVERDUE
+    CANCELLED
+}
+
+model Customer {
+    id String @id @default(uuid()) @db.Uuid
+    taxId String @unique @map("tax_id") @db.VarChar(50)
+    contactEmail String @map("contact_email") @db.VarChar(100)
+    invoices Invoice[]
+    createdAt DateTime @map("created_at") @default(now())
+    updatedAt DateTime @map("updated_at") @updatedAt
+
+    @@map("customers")
+}
+
+model Invoice {
+    id String @id @default(uuid()) @db.Uuid
+    customerId String @map("customer_id") @db.Uuid
+    totalAmount Decimal @map("total_amount") @db.Decimal(15, 2)
+    status InvoiceStatus @default(PENDING)
+    payment Payment[]
+    createdAt DateTime @map("created_at") @default(now())
+    updatedAt DateTime @map("updated_at") @updatedAt
+
+    customer Customer @relation(fields: [customerId], references: [id])
+
+    @@map("invoices")
+}
+
+model Payment {
+    id String @id @default(uuid()) @db.Uuid
+    invoiceId String @map("invoice_id") @db.Uuid    
+    paidAmount Decimal @map("paid_amount") @db.Decimal(15,2)
+    proofUrl String? @map("proof_url") @db.Text
+    createdAt DateTime @map("created_at") @default(now())
+
+    invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+    @@map("payments")
+}

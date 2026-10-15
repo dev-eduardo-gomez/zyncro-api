@@ -3,6 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module.js';
+import { existsSync } from 'node:fs';
+
+if (existsSync('.env')) process.loadEnvFile();
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -24,6 +27,6 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    await app?.close();
   });
 });
