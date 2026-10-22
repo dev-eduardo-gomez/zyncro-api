@@ -14,7 +14,7 @@
 
 | Módulo NestJS | Responsabilidad Principal | Dependencias / Librerías |
 | :--- | :--- | :--- |
-| **CoreModule** | Autenticación JWT, Guards de roles (RBAC), Interceptor RFC 7807 para manejo global de excepciones, ThrottlerGuard. | `@nestjs/jwt`, `passport`, `@nestjs/throttler` |
+| **CoreModule** | Autenticación JWT, Guards de roles (RBAC), filtro global de excepciones Problem Details RFC 9457 (`ProblemDetailsFilter`) y `ValidationPipe` global, ThrottlerGuard. | `@nestjs/jwt`, `passport`, `@nestjs/throttler` |
 | **ArModule (Cobrar)** | Gestión de clientes, emisión de facturas, generación de Magic Links y conciliación de ingresos. | PrismaService, MailerService |
 | **ApModule (Pagar)** | Buzón de egresos, validación de proveedores, gestión de nóminas y flujo Maker-Checker con firmas internas. | PrismaService, SecurityService |
 | **QueueModule (Batch)** | Procesadores BullMQ para Jobs programados (Cron), envío masivo de alertas WhatsApp/Email y vencimientos. | `@nestjs/bullmq`, Redis |

@@ -3,6 +3,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { PrismaModule } from './shared/infrastructure/persistence/prisma/prisma.module.js';
+import { CoreModule } from './core/core.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -16,6 +17,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       serviceId: 'zyncro-api',
     }),
     PrismaModule,
+    CoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],
