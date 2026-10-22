@@ -14,8 +14,10 @@ import {
   DEFAULT_PROBLEM_TYPE,
   Problem,
   PROBLEM_JSON_CONTENT_TYPE,
+  PROBLEM_TYPE_BASE_URI,
   ProblemDetails,
 } from './problem-details.js';
+import { RequestValidationException } from './request-validation.exception.js';
 
 const UNEXPECTED_ERROR_DETAIL = 'An unexpected error occurred.';
 
@@ -51,6 +53,16 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       return {
         ...toBusinessRuleProblem(exception.code),
         detail: exception.message,
+      };
+    }
+
+    if (exception instanceof RequestValidationException) {
+      return {
+        type: `${PROBLEM_TYPE_BASE_URI}/validation`,
+        title: 'Request validation failed',
+        status: exception.getStatus(),
+        detail: exception.message,
+        errors: exception.errors,
       };
     }
 

@@ -11,6 +11,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { BusinessRuleViolation } from '../../../domain/errors/business-rule-violation.js';
 import { ProblemDetailsFilter } from './problem-details.filter.js';
+import { RequestValidationException } from './request-validation.exception.js';
 
 const NOW = new Date('2026-10-21T12:00:00.000Z');
 const INTERNAL_SECRET = 'postgres://admin:s3cret@db:5432/cobrix';
@@ -60,6 +61,14 @@ class ProbeController {
   @Get('unavailable')
   unavailable() {
     throw new ServiceUnavailableException(`Pool exhausted: ${INTERNAL_SECRET}`);
+  }
+
+  @Get('invalid-request')
+  invalidRequest() {
+    throw new RequestValidationException([
+      { field: 'amount', detail: 'amount must be positive' },
+      { field: 'customer.taxId', detail: 'taxId should not be empty' },
+    ]);
   }
 }
 
@@ -117,6 +126,29 @@ describe('ProblemDetailsFilter', () => {
       title: 'Business rule violated',
       status: 422,
       detail: 'The customer exceeded the credit limit',
+    });
+  });
+
+  it('answers a request validation failure with the invalid fields', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/probe/invalid-request',
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.headers['content-type']).toMatch(
+      /^application\/problem\+json/,
+    );
+    expect(response.body).toEqual({
+      type: 'https://cobrix.io/errors/validation',
+      title: 'Request validation failed',
+      status: 400,
+      detail: 'The request contains invalid fields.',
+      instance: '/probe/invalid-request',
+      timestamp: NOW.toISOString(),
+      errors: [
+        { field: 'amount', detail: 'amount must be positive' },
+        { field: 'customer.taxId', detail: 'taxId should not be empty' },
+      ],
     });
   });
 
