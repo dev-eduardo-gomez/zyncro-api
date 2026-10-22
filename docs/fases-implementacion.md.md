@@ -11,7 +11,7 @@
 
 ## FASE 3: Seguridad, Autenticación JWT & Manejo de Errores
 * Implementar `AuthModule` en NestJS usando `@nestjs/jwt` y Passport para estrategias Bearer JWT stateless y RBAC.
-* Crear un `GlobalExceptionFilter` en NestJS para formatear todas las excepciones bajo el estándar RFC 7807 (Problem Details).
+* Crear un filtro global de excepciones en NestJS (`ProblemDetailsFilter`) para formatear todas las excepciones bajo el estándar RFC 9457 (Problem Details, sucesor de RFC 7807).
 * Configurar `ThrottlerModule` integrado con Redis para protección contra fuerza bruta.
 
 ## FASE 4: Motor de Vencimientos Batch & Colas BullMQ
