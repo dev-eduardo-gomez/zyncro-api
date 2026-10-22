@@ -6,12 +6,16 @@ export const PROBLEM_TYPE_BASE_URI = 'https://cobrix.io/errors';
 // beyond its HTTP status code.
 export const DEFAULT_PROBLEM_TYPE = 'about:blank';
 
-export interface ProblemDetails {
+// What went wrong, independent of the request it happened on.
+export interface Problem {
   type: string;
   title: string;
   status: number;
   detail: string;
+  [extension: string]: unknown;
+}
+
+export interface ProblemDetails extends Problem {
   instance: string;
   timestamp: string;
-  [extension: string]: unknown;
 }
