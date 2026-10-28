@@ -11,6 +11,9 @@ import { Argon2PasswordHasher } from './infrastructure/security/argon2-password-
 import { AccessTokenIssuer } from './domain/ports/access-token-issuer.js';
 import { JwtAccessTokenIssuer } from './infrastructure/security/jwt-access-token-issuer.js';
 import { JwtStrategy } from './infrastructure/security/jwt.strategy.js';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './infrastructure/security/jwt-auth.guard.js';
+import { RolesGuard } from './infrastructure/security/roles.guard.js';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { JwtStrategy } from './infrastructure/security/jwt.strategy.js';
       provide: AccessTokenIssuer,
       useClass: JwtAccessTokenIssuer,
     },
+    // Global guards run in registration order: authenticate first, then authorize.
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AuthModule {}
