@@ -10,6 +10,7 @@ import { PasswordHasher } from './domain/ports/password-hasher.js';
 import { Argon2PasswordHasher } from './infrastructure/security/argon2-password-hasher.js';
 import { AccessTokenIssuer } from './domain/ports/access-token-issuer.js';
 import { JwtAccessTokenIssuer } from './infrastructure/security/jwt-access-token-issuer.js';
+import { JwtStrategy } from './infrastructure/security/jwt.strategy.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { JwtAccessTokenIssuer } from './infrastructure/security/jwt-access-token
   controllers: [AuthController],
   providers: [
     LoginUseCase,
+    JwtStrategy,
     {
       provide: UserCredentialsRepository,
       useClass: PrismaUserCredentialsRepository,
