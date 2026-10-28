@@ -7,6 +7,12 @@ datasource db {
     provider = "postgresql"
 }
 
+enum Role {
+    MAKER
+    CHECKER
+    ADMIN
+}
+
 enum InvoiceStatus {
     PENDING
     PAID
@@ -41,7 +47,7 @@ model Invoice {
 
 model Payment {
     id String @id @default(uuid()) @db.Uuid
-    invoiceId String @map("invoice_id") @db.Uuid    
+    invoiceId String @map("invoice_id") @db.Uuid
     paidAmount Decimal @map("paid_amount") @db.Decimal(15,2)
     proofUrl String? @map("proof_url") @db.Text
     createdAt DateTime @map("created_at") @default(now())
@@ -49,4 +55,15 @@ model Payment {
     invoice Invoice @relation(fields: [invoiceId], references: [id])
 
     @@map("payments")
+}
+
+model User {
+    id String @id @default(uuid()) @db.Uuid
+    email String @unique @db.VarChar(100)
+    passwordHash String @map("password_hash") @db.Text
+    role Role @default(MAKER)
+    createdAt DateTime @map("created_at") @default(now())
+    updatedAt DateTime @map("updated_at") @updatedAt
+
+    @@map("users")
 }
