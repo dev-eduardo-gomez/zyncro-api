@@ -10,6 +10,7 @@ import { Test } from '@nestjs/testing';
 import { IsIn, IsPositive } from 'class-validator';
 import { existsSync } from 'node:fs';
 import request from 'supertest';
+import { Public } from '../src/auth/infrastructure/security/public.decorator.js';
 import { AppModule } from './../src/app.module.js';
 import { BusinessRuleViolation } from './../src/shared/domain/errors/business-rule-violation.js';
 
@@ -34,6 +35,8 @@ class CreateInvoiceDto {
   currency: string;
 }
 
+// Public: these routes exercise Problem Details, not authentication.
+@Public()
 @Controller('e2e-probe')
 class ProbeController {
   @Post('invoices')
