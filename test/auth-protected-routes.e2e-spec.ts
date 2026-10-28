@@ -18,6 +18,12 @@ class AdminOnlyController {
   adminOnly() {
     return { ok: true };
   }
+
+  @Roles(Role.CHECKER, Role.ADMIN)
+  @Get('checker-or-admin')
+  checkerOrAdmin() {
+    return { ok: true };
+  }
 }
 
 describe('Protected routes (e2e)', () => {
@@ -90,6 +96,27 @@ describe('Protected routes (e2e)', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ ok: true });
+    });
+
+    it.each([Role.CHECKER, Role.ADMIN])(
+      'lets %s through a route that allows several roles',
+      async (role) => {
+        const response = await request(app.getHttpServer())
+          .get('/e2e-probe/checker-or-admin')
+          .set('Authorization', `Bearer ${tokenFor(role)}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ ok: true });
+      },
+    );
+
+    it('rejects a role outside the allowed list with 403', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/e2e-probe/checker-or-admin')
+        .set('Authorization', `Bearer ${tokenFor(Role.MAKER)}`);
+
+      expect(response.status).toBe(403);
+      expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     });
   });
 });
