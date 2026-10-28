@@ -1,4 +1,4 @@
-import type { Role } from './role.js';
+import type { Role } from '../models/role.js';
 
 export interface AccessTokenClaims {
   readonly sub: string;

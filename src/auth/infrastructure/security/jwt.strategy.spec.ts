@@ -1,5 +1,5 @@
 import { JwtStrategy } from './jwt.strategy.js';
-import { Role } from '../../domain/role.js';
+import { Role } from '../../domain/models/role.js';
 
 describe('JwtStrategy', () => {
   it('maps the token payload to the authenticated user shape', async () => {

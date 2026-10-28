@@ -1,5 +1,5 @@
 import { Role as PrismaRole } from '../../../generated/prisma/enums.js';
-import { Role } from '../../domain/role.js';
+import { Role } from '../../domain/models/role.js';
 
 describe('Prisma Role enum', () => {
   it('holds the same values as the domain Role', () => {

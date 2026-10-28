@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
 import { PrismaService } from '../../src/shared/infrastructure/persistence/prisma/prisma.service.js';
 import { PrismaUserCredentialsRepository } from '../../src/auth/infrastructure/persistence/prisma-user-credentials-repository.js';
-import { Role } from '../../src/auth/domain/role.js';
+import { Role } from '../../src/auth/domain/models/role.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 

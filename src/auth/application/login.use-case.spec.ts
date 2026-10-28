@@ -1,9 +1,9 @@
 import { LoginUseCase } from './login.use-case.js';
-import { PasswordHasher } from '../domain/password-hasher.js';
-import { UserCredentialsRepository } from '../domain/user-credentials-repository.js';
-import { AccessTokenIssuer } from '../domain/access-token-issuer.js';
-import { Role } from '../domain/role.js';
-import type { User } from '../domain/user.js';
+import { PasswordHasher } from '../domain/ports/password-hasher.js';
+import { UserCredentialsRepository } from '../domain/ports/user-credentials-repository.js';
+import { AccessTokenIssuer } from '../domain/ports/access-token-issuer.js';
+import { Role } from '../domain/models/role.js';
+import type { User } from '../domain/models/user.js';
 
 class FakeUserCredentialsRepository extends UserCredentialsRepository {
   constructor(private readonly user: User | null) {

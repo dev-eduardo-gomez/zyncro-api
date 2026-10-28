@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserCredentialsRepository } from '../../domain/user-credentials-repository.js';
+import { UserCredentialsRepository } from '../../domain/ports/user-credentials-repository.js';
 import { PrismaService } from '../../../shared/infrastructure/persistence/prisma/prisma.service.js';
-import { type User } from '../../domain/user.js';
+import { type User } from '../../domain/models/user.js';
 
 @Injectable()
 export class PrismaUserCredentialsRepository extends UserCredentialsRepository {

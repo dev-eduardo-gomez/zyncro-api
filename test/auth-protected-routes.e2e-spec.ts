@@ -3,9 +3,9 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { existsSync } from 'node:fs';
 import { AppModule } from '../src/app.module.js';
-import { AccessTokenIssuer } from '../src/auth/domain/access-token-issuer.js';
+import { AccessTokenIssuer } from '../src/auth/domain/ports/access-token-issuer.js';
 import { Roles } from '../src/auth/infrastructure/security/roles.decorator.js';
-import { Role } from '../src/auth/domain/role.js';
+import { Role } from '../src/auth/domain/models/role.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 
