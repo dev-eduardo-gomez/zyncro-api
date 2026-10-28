@@ -3,10 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtConfig } from '../config/jwt.config.js';
 import type { ConfigType } from '@nestjs/config';
-import { AccessTokenClaims } from '../../domain/ports/access-token-issuer.js';
-import { AuthenticatedUser } from '../../domain/models/authenticated-user.js';
+import type { AccessTokenClaims } from '../../domain/ports/access-token-issuer.js';
+import type { AuthenticatedUser } from '../../domain/models/authenticated-user.js';
 
-interface PayloadAccessToken extends AccessTokenClaims {
+interface AccessTokenPayload extends AccessTokenClaims {
   iat: number;
   exp: number;
 }
@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: PayloadAccessToken): Promise<AuthenticatedUser> {
+  async validate(payload: AccessTokenPayload): Promise<AuthenticatedUser> {
     return {
       id: payload.sub,
       email: payload.email,
