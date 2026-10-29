@@ -52,6 +52,11 @@ differs, or when the body does not match the schema. It checks the response's
 `test/contract-security.e2e-spec.ts` reads every operation from the contract.
 Each one that requires authentication (it inherits the global `bearerAuth`, or it
 declares its own requirement) must answer 401 without a token and with an invalid
-token. When you add a protected operation to the contract, the test covers it with
+token. Each one the contract declares public (`security: []`) must not answer 401
+without a token. When you add an operation to the contract, the test covers it with
 no extra code. When a route is public in the code (`@Public()`) but protected in the
 contract, or the other way around, the test fails.
+
+The test only sees operations the contract declares. A route that exists in the code
+but not in the contract is not detected, so code review enforces that every route is
+in the contract first.

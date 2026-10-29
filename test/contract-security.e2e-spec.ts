@@ -17,6 +17,12 @@ const protectedOperations = cobrixContract
   .operations()
   .filter((operation) => operation.requiresAuth);
 
+// The other direction: an operation the contract declares public
+// (`security: []`) must not be blocked by the guard.
+const publicOperations = cobrixContract
+  .operations()
+  .filter((operation) => !operation.requiresAuth);
+
 // Path parameters only need a well-formed value: the guard runs before any
 // lookup, so the resource does not have to exist.
 const PATH_PARAMETER_VALUE = '8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70';
@@ -57,6 +63,19 @@ describe('Contract security (e2e)', () => {
         .set('Authorization', 'Bearer not-a-real-token');
 
       expect(response.status).toBe(401);
+      assertMatchesContract(method, path, response);
+    });
+  });
+
+  it('finds public operations in the contract', () => {
+    expect(publicOperations.length).toBeGreaterThan(0);
+  });
+
+  describe.each(publicOperations)('$method $path', ({ method, path }) => {
+    it('lets a request without a token past the guard', async () => {
+      const response = await request(app.getHttpServer())[method](toUrl(path));
+
+      expect(response.status).not.toBe(401);
       assertMatchesContract(method, path, response);
     });
   });
