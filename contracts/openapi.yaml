@@ -1,0 +1,256 @@
+openapi: 3.1.0
+info:
+  title: Cobrix API
+  version: 0.1.0
+  summary: Accounts receivable and payables API for Cobrix.
+  description: |
+    Contract-first source of truth for the Cobrix HTTP API. Every endpoint is
+    designed here before it is implemented, and e2e tests validate real
+    responses against these schemas.
+
+    Conventions:
+    - Every route requires a bearer JWT unless the operation sets `security: []`.
+    - Every error response uses RFC 9457 Problem Details
+      (`application/problem+json`) with two extensions: `instance` and
+      `timestamp`.
+    - Problem `type` values: `https://cobrix.io/errors/validation` for request
+      validation, `https://cobrix.io/errors/business-rule/{code}` for domain
+      rule violations, and `about:blank` for plain HTTP errors (401, 403,
+      404, 500).
+    - JSON property names use camelCase; timestamps are ISO 8601 in UTC.
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+servers:
+  - url: /
+    description: Same origin as the caller (local development runs on port 3000).
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+    description: Authentication and the current user's identity.
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Exchange credentials for an access token
+      description: |
+        Public. An unknown email and a wrong password return the same 401 body,
+        so the response does not reveal which emails exist.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: maker@cobrix.io
+              password: S3cure-Passw0rd!
+      responses:
+        '200':
+          description: Credentials are valid; a stateless JWT was issued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+              example:
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI...
+                tokenType: Bearer
+                expiresIn: 900
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+        '401':
+          description: Unknown email or wrong password.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: about:blank
+                title: Unauthorized
+                status: 401
+                detail: Invalid email or password.
+                instance: /auth/login
+                timestamp: '2026-10-28T18:00:00.000Z'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      summary: Identity of the authenticated user
+      description: Returns the claims carried by the bearer token. Any role may call it.
+      responses:
+        '200':
+          description: The authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+              example:
+                id: 8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70
+                email: maker@cobrix.io
+                role: MAKER
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token issued by `POST /auth/login`.
+
+  schemas:
+    Role:
+      type: string
+      enum: [MAKER, CHECKER, ADMIN]
+      description: |
+        MAKER creates operations, CHECKER approves them (never their own),
+        ADMIN manages configuration and users.
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+          writeOnly: true
+
+    AccessToken:
+      type: object
+      required: [accessToken, tokenType, expiresIn]
+      additionalProperties: false
+      properties:
+        accessToken:
+          type: string
+          description: Signed JWT whose claims are `sub`, `email`, `role`, `iat` and `exp`.
+        tokenType:
+          type: string
+          const: Bearer
+        expiresIn:
+          type: integer
+          minimum: 1
+          description: Token lifetime in seconds.
+
+    AuthenticatedUser:
+      type: object
+      required: [id, email, role]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+
+    ProblemDetails:
+      type: object
+      description: RFC 9457 Problem Details plus the `instance` and `timestamp` extensions.
+      required: [type, title, status, detail, instance, timestamp]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: '`about:blank`, or a URI under `https://cobrix.io/errors/`.'
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          description: Request path that produced the problem.
+        timestamp:
+          type: string
+          format: date-time
+
+    InvalidField:
+      type: object
+      required: [field, detail]
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+          description: Dot-separated path of the invalid property (for example `address.zipCode`).
+        detail:
+          type: string
+
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          required: [errors]
+          properties:
+            type:
+              const: https://cobrix.io/errors/validation
+            status:
+              const: 400
+            errors:
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/InvalidField'
+
+  responses:
+    ValidationFailed:
+      description: The request body or parameters failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+          example:
+            type: https://cobrix.io/errors/validation
+            title: Request validation failed
+            status: 400
+            detail: The request contains invalid fields.
+            instance: /auth/login
+            timestamp: '2026-10-28T18:00:00.000Z'
+            errors:
+              - field: email
+                detail: email must be an email
+
+    Unauthorized:
+      description: Missing, malformed, or expired bearer token.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: about:blank
+            title: Unauthorized
+            status: 401
+            detail: Unauthorized
+            instance: /auth/me
+            timestamp: '2026-10-28T18:00:00.000Z'
+
+    InternalError:
+      description: Unexpected server failure. Internals are logged, never returned.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: about:blank
+            title: Internal Server Error
+            status: 500
+            detail: An unexpected error occurred.
+            instance: /auth/me
+            timestamp: '2026-10-28T18:00:00.000Z'
