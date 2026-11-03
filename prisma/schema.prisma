@@ -23,7 +23,11 @@ enum InvoiceStatus {
 model Customer {
     id String @id @default(uuid()) @db.Uuid
     taxId String @unique @map("tax_id") @db.VarChar(50)
+    legalName String @map("legal_name") @db.VarChar(200)
+    address String @db.Text
     contactEmail String @map("contact_email") @db.VarChar(100)
+    creditDays Int @map("credit_days")
+    creditBalance Decimal @map("credit_balance") @default(0) @db.Decimal(15, 2)
     invoices Invoice[]
     createdAt DateTime @map("created_at") @default(now())
     updatedAt DateTime @map("updated_at") @updatedAt
