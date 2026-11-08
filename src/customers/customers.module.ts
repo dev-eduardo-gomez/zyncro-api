@@ -21,5 +21,6 @@ import { PrismaModule } from '../shared/infrastructure/persistence/prisma/prisma
       useClass: PrismaCustomerRepository,
     },
   ],
+  exports: [CustomerRepository],
 })
 export class CustomersModule {}

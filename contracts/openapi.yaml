@@ -228,6 +228,12 @@ paths:
         No fiscal stamping (see #35, deferred). `dueDate` is computed from the
         customer's `creditDays`; `subtotal`, `tax` and `total` are computed
         from `lineItems` and are not accepted in the request.
+
+        Rounding (R2), always half-up to 2 decimals:
+        1. `lineTotal = round(quantity * unitPrice)` per line.
+        2. `subtotal = sum(lineTotal)`, exact.
+        3. `tax = round(sum(lineTotal * taxRate))`, rounded once per invoice, not per line.
+        4. `total = subtotal + tax`, exact.
       requestBody:
         required: true
         content:
@@ -599,23 +605,33 @@ components:
         quantity:
           type: number
           exclusiveMinimum: 0
+          description: At most 4 decimal places.
         unitPrice:
           $ref: '#/components/schemas/Money'
         taxRate:
           type: number
           minimum: 0
           maximum: 1
-          description: Fraction, e.g. `0.16` for 16%. Not a country-specific tax code.
+          description: Fraction with at most 4 decimal places, e.g. `0.16` for 16%. Not a country-specific tax code.
 
+    # Standalone rather than `allOf` over InvoiceLineItemInput: that schema's
+    # `additionalProperties: false` would reject `lineTotal` inside an `allOf`.
     InvoiceLineItem:
-      allOf:
-        - $ref: '#/components/schemas/InvoiceLineItemInput'
-        - type: object
-          required: [lineTotal]
-          properties:
-            lineTotal:
-              $ref: '#/components/schemas/Money'
-              description: 'quantity * unitPrice, before tax. Server-computed.'
+      type: object
+      required: [description, quantity, unitPrice, taxRate, lineTotal]
+      additionalProperties: false
+      properties:
+        description:
+          $ref: '#/components/schemas/InvoiceLineItemInput/properties/description'
+        quantity:
+          $ref: '#/components/schemas/InvoiceLineItemInput/properties/quantity'
+        unitPrice:
+          $ref: '#/components/schemas/Money'
+        taxRate:
+          $ref: '#/components/schemas/InvoiceLineItemInput/properties/taxRate'
+        lineTotal:
+          $ref: '#/components/schemas/Money'
+          description: 'quantity * unitPrice rounded half-up to 2 decimals, before tax. Server-computed.'
 
     InvoiceCreateRequest:
       type: object
@@ -674,12 +690,13 @@ components:
             $ref: '#/components/schemas/InvoiceLineItem'
         subtotal:
           $ref: '#/components/schemas/Money'
-          description: 'Sum of lineTotal (R2).'
+          description: 'Sum of lineTotal (R2). Exact, no further rounding.'
         tax:
           $ref: '#/components/schemas/Money'
+          description: 'sum(lineTotal * taxRate), rounded half-up to 2 decimals once per invoice (R2).'
         total:
           $ref: '#/components/schemas/Money'
-          description: 'subtotal + tax (R2). Rounded half-up to 2 decimals.'
+          description: 'subtotal + tax (R2). Exact, no further rounding.'
         balance:
           $ref: '#/components/schemas/Money'
           description: Pending amount; total minus applied payments. Never negative (R5).
@@ -690,7 +707,7 @@ components:
         dueDate:
           type: string
           format: date
-          description: "Computed from the customer's `creditDays` at creation time."
+          description: "Creation date (UTC) plus the customer's `creditDays` at creation time."
         createdAt:
           type: string
           format: date-time
