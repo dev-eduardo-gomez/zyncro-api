@@ -1,0 +1,36 @@
+meta {
+  name: Create customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/customers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "taxId": "TAX-{{$timestamp}}",
+    "legalName": "Acme Corp",
+    "address": "Av. Siempre Viva 123, CDMX",
+    "contactEmail": "billing@acme.test",
+    "creditDays": 30
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("customerId", res.body.id);
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+docs {
+  `taxId` uses `{{$timestamp}}` so repeated runs do not hit the 409 duplicate rule.
+  Stores the new id as `customerId` for the other requests.
+}

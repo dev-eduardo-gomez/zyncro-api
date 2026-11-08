@@ -1,0 +1,12 @@
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Every request inherits the bearer token set by `auth/Login`.
+  Run `Login` first; it stores `accessToken` as a runtime variable.
+}
