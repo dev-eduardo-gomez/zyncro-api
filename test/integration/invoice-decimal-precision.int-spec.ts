@@ -45,7 +45,10 @@ describe('Invoice amount persistence', () => {
     await prisma.customer.create({
       data: {
         taxId: duplicatedTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test2@test.int',
+        creditDays: 30,
       },
     });
 
@@ -53,7 +56,10 @@ describe('Invoice amount persistence', () => {
       prisma.customer.create({
         data: {
           taxId: duplicatedTaxId,
+          legalName: 'Acme Corp',
+          address: 'Av. Siempre Viva 123, CDMX',
           contactEmail: 'test2@test.int',
+          creditDays: 30,
         },
       }),
     ).rejects.toMatchObject({ code: 'P2002' });
@@ -65,7 +71,10 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: sumTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test3@test.float',
+        creditDays: 30,
       },
     });
 
@@ -90,7 +99,10 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: roundTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test4@test.round',
+        creditDays: 30,
       },
     });
 
@@ -110,7 +122,10 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: maxTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test5@test.max',
+        creditDays: 30,
       },
     });
 
@@ -130,7 +145,10 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: overflowTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test6@test.overflow',
+        creditDays: 30,
       },
     });
 
