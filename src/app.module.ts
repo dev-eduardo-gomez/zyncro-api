@@ -5,11 +5,18 @@ import { CoreModule } from './core/core.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ObserveCredentials } from './shared/infrastructure/observability/observe.config.js';
 import { CustomersModule } from './customers/customers.module.js';
+import { InvoicesModule } from './invoices/invoices.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
-  imports: [PrismaModule, CoreModule, AuthModule, CustomersModule],
+  imports: [
+    PrismaModule,
+    CoreModule,
+    AuthModule,
+    CustomersModule,
+    InvoicesModule,
+  ],
 })
 export class AppModule {
   // Decided at bootstrap, after the .env file is loaded: the @Module()
