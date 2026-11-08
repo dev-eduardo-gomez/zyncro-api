@@ -117,6 +117,24 @@ describe('Customers (e2e)', () => {
     ]);
   });
 
+  it('rejects a field the create request does not declare and stores nothing', async () => {
+    const customer = validCustomer('undeclared-create');
+
+    const response = await authed('post', '/customers').send({
+      ...customer,
+      creditBalance: '9999.00',
+    });
+
+    assertMatchesContract('post', '/customers', response);
+    expect(response.status).toBe(400);
+    expect(
+      response.body.errors.map((error: { field: string }) => error.field),
+    ).toContain('creditBalance');
+    expect(
+      await prisma.customer.count({ where: { taxId: customer.taxId } }),
+    ).toBe(0);
+  });
+
   it('gets a customer by id', async () => {
     const created = await authed('post', '/customers').send(
       validCustomer('get-by-id'),
@@ -168,6 +186,28 @@ describe('Customers (e2e)', () => {
       legalName: 'Acme Corp Renamed',
       creditDays: 45,
     });
+  });
+
+  it('rejects taxId and other undeclared fields on update, leaving the customer unchanged', async () => {
+    const created = await authed('post', '/customers').send(
+      validCustomer('undeclared-update'),
+    );
+
+    const response = await authed(
+      'patch',
+      `/customers/${created.body.id}`,
+    ).send({ taxId: `${TAX_ID_PREFIX}-other`, creditBalance: '9999.00' });
+
+    assertMatchesContract('patch', '/customers/{customerId}', response);
+    expect(response.status).toBe(400);
+    expect(
+      response.body.errors.map((error: { field: string }) => error.field),
+    ).toEqual(expect.arrayContaining(['taxId', 'creditBalance']));
+    const stored = await prisma.customer.findUniqueOrThrow({
+      where: { id: created.body.id },
+    });
+    expect(stored.taxId).toBe(created.body.taxId);
+    expect(stored.creditBalance.toFixed(2)).toBe('0.00');
   });
 
   it('answers 404 when patching an unknown customer id', async () => {
