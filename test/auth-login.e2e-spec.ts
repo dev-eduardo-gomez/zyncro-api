@@ -93,4 +93,17 @@ describe('POST /auth/login (e2e)', () => {
       { field: 'password', detail: 'password should not be empty' },
     ]);
   });
+
+  it('rejects a field the request does not declare, even with the right credentials', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email, password, role: 'ADMIN' });
+
+    assertMatchesContract('post', '/auth/login', response);
+    expect(response.status).toBe(400);
+    expect(response.body.accessToken).toBeUndefined();
+    expect(response.body.errors).toEqual([
+      { field: 'role', detail: 'property role should not exist' },
+    ]);
+  });
 });
