@@ -1,0 +1,29 @@
+meta {
+  name: Update customer
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/customers/:customerId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  customerId: {{customerId}}
+}
+
+body:json {
+  {
+    "creditDays": 45
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `taxId` is immutable and is not part of this request.
+}
