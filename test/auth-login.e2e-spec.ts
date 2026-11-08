@@ -6,6 +6,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client.js';
 import { AppModule } from '../src/app.module.js';
 import { Argon2PasswordHasher } from '../src/auth/infrastructure/security/argon2-password-hasher.js';
+import { assertMatchesContract } from './contract/openapi-contract.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 
@@ -44,6 +45,7 @@ describe('POST /auth/login (e2e)', () => {
       .post('/auth/login')
       .send({ email, password });
 
+    assertMatchesContract('post', '/auth/login', response);
     expect(response.status).toBe(200);
     expect(response.body.tokenType).toBe('Bearer');
     expect(typeof response.body.accessToken).toBe('string');
@@ -63,6 +65,7 @@ describe('POST /auth/login (e2e)', () => {
       .post('/auth/login')
       .send({ email: 'does-not-exist@users.int', password });
 
+    assertMatchesContract('post', '/auth/login', response);
     expect(response.status).toBe(401);
     expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     expect(response.body.detail).toBe('Invalid email or password.');
@@ -73,6 +76,7 @@ describe('POST /auth/login (e2e)', () => {
       .post('/auth/login')
       .send({ email, password: 'wrong-password' });
 
+    assertMatchesContract('post', '/auth/login', response);
     expect(response.status).toBe(401);
     expect(response.body.detail).toBe('Invalid email or password.');
   });
@@ -82,6 +86,7 @@ describe('POST /auth/login (e2e)', () => {
       .post('/auth/login')
       .send({ email: 'not-an-email', password: '' });
 
+    assertMatchesContract('post', '/auth/login', response);
     expect(response.status).toBe(400);
     expect(response.body.errors).toEqual([
       { field: 'email', detail: 'email must be an email' },

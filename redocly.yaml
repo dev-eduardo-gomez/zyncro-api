@@ -1,0 +1,6 @@
+extends:
+  - recommended-strict
+
+apis:
+  cobrix:
+    root: contracts/openapi.yaml

@@ -6,10 +6,14 @@ import { AppModule } from '../src/app.module.js';
 import { AccessTokenIssuer } from '../src/auth/domain/ports/access-token-issuer.js';
 import { Roles } from '../src/auth/infrastructure/security/roles.decorator.js';
 import { Role } from '../src/auth/domain/models/role.js';
+import { assertMatchesContract } from './contract/openapi-contract.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 
 const PROBLEM_JSON = /^application\/problem\+json/;
+
+// User ids are UUIDs (prisma/schema.prisma), as the contract declares.
+const USER_ID = '8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70';
 
 @Controller('e2e-probe')
 class AdminOnlyController {
@@ -31,7 +35,7 @@ describe('Protected routes (e2e)', () => {
   let issuer: AccessTokenIssuer;
 
   const tokenFor = (role: Role) =>
-    issuer.issue({ sub: 'user-1', email: 'user@zyncro.test', role })
+    issuer.issue({ sub: USER_ID, email: 'user@zyncro.test', role })
       .accessToken;
 
   beforeAll(async () => {
@@ -53,6 +57,7 @@ describe('Protected routes (e2e)', () => {
     it('rejects a request without a token with 401', async () => {
       const response = await request(app.getHttpServer()).get('/auth/me');
 
+      assertMatchesContract('get', '/auth/me', response);
       expect(response.status).toBe(401);
       expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     });
@@ -62,6 +67,7 @@ describe('Protected routes (e2e)', () => {
         .get('/auth/me')
         .set('Authorization', 'Bearer not-a-real-token');
 
+      assertMatchesContract('get', '/auth/me', response);
       expect(response.status).toBe(401);
     });
 
@@ -70,9 +76,10 @@ describe('Protected routes (e2e)', () => {
         .get('/auth/me')
         .set('Authorization', `Bearer ${tokenFor(Role.CHECKER)}`);
 
+      assertMatchesContract('get', '/auth/me', response);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        id: 'user-1',
+        id: USER_ID,
         email: 'user@zyncro.test',
         role: 'CHECKER',
       });
