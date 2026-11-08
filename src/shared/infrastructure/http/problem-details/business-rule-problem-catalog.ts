@@ -16,6 +16,10 @@ const CATALOG: Readonly<Record<string, CatalogEntry>> = {
     title: 'Maker-checker rule violated',
     status: HttpStatus.FORBIDDEN,
   },
+  'customer-duplicate-tax-id': {
+    title: 'Duplicate tax id',
+    status: HttpStatus.CONFLICT,
+  },
 };
 
 const FALLBACK: CatalogEntry = {

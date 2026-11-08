@@ -18,12 +18,17 @@ enum InvoiceStatus {
     PAID
     OVERDUE
     CANCELLED
+    DISPUTED
 }
 
 model Customer {
     id String @id @default(uuid()) @db.Uuid
     taxId String @unique @map("tax_id") @db.VarChar(50)
+    legalName String @map("legal_name") @db.VarChar(200)
+    address String @db.Text
     contactEmail String @map("contact_email") @db.VarChar(100)
+    creditDays Int @map("credit_days")
+    creditBalance Decimal @map("credit_balance") @default(0) @db.Decimal(15, 2)
     invoices Invoice[]
     createdAt DateTime @map("created_at") @default(now())
     updatedAt DateTime @map("updated_at") @updatedAt
@@ -33,9 +38,16 @@ model Customer {
 
 model Invoice {
     id String @id @default(uuid()) @db.Uuid
+    // Backed by a native Postgres sequence: unique under concurrent inserts (R3).
+    folio Int @unique @default(autoincrement())
     customerId String @map("customer_id") @db.Uuid
-    totalAmount Decimal @map("total_amount") @db.Decimal(15, 2)
+    currency String @db.Char(3)
+    subtotal Decimal @db.Decimal(15, 2)
+    tax Decimal @db.Decimal(15, 2)
+    total Decimal @db.Decimal(15, 2)
     status InvoiceStatus @default(PENDING)
+    dueDate DateTime @map("due_date") @db.Date
+    lineItems InvoiceLineItem[]
     payment Payment[]
     createdAt DateTime @map("created_at") @default(now())
     updatedAt DateTime @map("updated_at") @updatedAt
@@ -43,6 +55,22 @@ model Invoice {
     customer Customer @relation(fields: [customerId], references: [id])
 
     @@map("invoices")
+}
+
+model InvoiceLineItem {
+    id String @id @default(uuid()) @db.Uuid
+    invoiceId String @map("invoice_id") @db.Uuid
+    position Int
+    description String @db.Text
+    quantity Decimal @db.Decimal(12, 4)
+    unitPrice Decimal @map("unit_price") @db.Decimal(15, 2)
+    taxRate Decimal @map("tax_rate") @db.Decimal(5, 4)
+    lineTotal Decimal @map("line_total") @db.Decimal(15, 2)
+
+    invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+    @@unique([invoiceId, position])
+    @@map("invoice_line_items")
 }
 
 model Payment {
