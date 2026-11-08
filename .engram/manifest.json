@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "chunks": [
     {
       "id": "517230d0",
@@ -39,6 +39,22 @@
       "created_at": "2026-10-15T05:36:25.1151517Z",
       "sessions": 11,
       "memories": 22,
+      "prompts": 0
+    },
+    {
+      "id": "6339d723",
+      "created_by": "ofima",
+      "created_at": "2026-10-28T06:49:32.0429983Z",
+      "sessions": 9,
+      "memories": 12,
+      "prompts": 0
+    },
+    {
+      "id": "13f1e0eb",
+      "created_by": "ofima",
+      "created_at": "2026-10-28T23:43:51.0856729Z",
+      "sessions": 2,
+      "memories": 7,
       "prompts": 0
     }
   ]

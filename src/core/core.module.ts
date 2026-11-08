@@ -1,0 +1,23 @@
+import { Module, ValidationPipe } from '@nestjs/common';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ProblemDetailsFilter } from '../shared/infrastructure/http/problem-details/problem-details.filter.js';
+import { validationExceptionFactory } from '../shared/infrastructure/http/problem-details/validation-exception.factory.js';
+
+@Module({
+  providers: [
+    { provide: APP_FILTER, useClass: ProblemDetailsFilter },
+    {
+      provide: APP_PIPE,
+      useFactory: () =>
+        new ValidationPipe({
+          // Request bodies are closed (`additionalProperties: false` in the
+          // contract): a property the DTO does not declare is a 400, never
+          // silently forwarded to persistence.
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          exceptionFactory: validationExceptionFactory,
+        }),
+    },
+  ],
+})
+export class CoreModule {}

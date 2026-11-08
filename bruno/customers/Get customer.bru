@@ -1,0 +1,19 @@
+meta {
+  name: Get customer
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/customers/:customerId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  customerId: {{customerId}}
+}
+
+assert {
+  res.status: eq 200
+}

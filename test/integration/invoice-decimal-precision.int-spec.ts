@@ -5,6 +5,15 @@ import { existsSync } from 'node:fs';
 
 if (existsSync('.env')) process.loadEnvFile();
 
+const invoiceWithTotal = (customerId: string, total: string) => ({
+  customerId,
+  currency: 'MXN',
+  subtotal: total,
+  tax: '0',
+  total,
+  dueDate: new Date('2026-12-03'),
+});
+
 describe('Invoice amount persistence', () => {
   let prisma: PrismaClient;
   const taxId = `TEST-${Date.now()}`;
@@ -45,7 +54,10 @@ describe('Invoice amount persistence', () => {
     await prisma.customer.create({
       data: {
         taxId: duplicatedTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test2@test.int',
+        creditDays: 30,
       },
     });
 
@@ -53,7 +65,10 @@ describe('Invoice amount persistence', () => {
       prisma.customer.create({
         data: {
           taxId: duplicatedTaxId,
+          legalName: 'Acme Corp',
+          address: 'Av. Siempre Viva 123, CDMX',
           contactEmail: 'test2@test.int',
+          creditDays: 30,
         },
       }),
     ).rejects.toMatchObject({ code: 'P2002' });
@@ -65,23 +80,25 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: sumTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test3@test.float',
+        creditDays: 30,
       },
     });
 
     await prisma.invoice.createMany({
-      data: Array.from({ length: 10 }, () => ({
-        customerId: customerNew.id,
-        totalAmount: '0.10',
-      })),
+      data: Array.from({ length: 10 }, () =>
+        invoiceWithTotal(customerNew.id, '0.10'),
+      ),
     });
 
     const invoicesSum = await prisma.invoice.aggregate({
       where: { customerId: customerNew.id },
-      _sum: { totalAmount: true },
+      _sum: { total: true },
     });
 
-    expect(invoicesSum._sum.totalAmount?.toString()).toBe('1');
+    expect(invoicesSum._sum.total?.toString()).toBe('1');
   });
 
   it('rounds amounts beyond two decimals half away from zero', async () => {
@@ -90,18 +107,18 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: roundTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test4@test.round',
+        creditDays: 30,
       },
     });
 
     const invoiceNew = await prisma.invoice.create({
-      data: {
-        customerId: customerNew.id,
-        totalAmount: '10.005',
-      },
+      data: invoiceWithTotal(customerNew.id, '10.005'),
     });
 
-    expect(invoiceNew.totalAmount.toString()).toBe('10.01');
+    expect(invoiceNew.total.toString()).toBe('10.01');
   });
 
   it('stores the maximum amount without losing precision', async () => {
@@ -110,18 +127,18 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: maxTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test5@test.max',
+        creditDays: 30,
       },
     });
 
     const invoiceNew = await prisma.invoice.create({
-      data: {
-        customerId: customerNew.id,
-        totalAmount: '9999999999999.99',
-      },
+      data: invoiceWithTotal(customerNew.id, '9999999999999.99'),
     });
 
-    expect(invoiceNew.totalAmount.toString()).toBe('9999999999999.99');
+    expect(invoiceNew.total.toString()).toBe('9999999999999.99');
   });
 
   it('rejects amounts with more than 13 integer digits', async () => {
@@ -130,16 +147,16 @@ describe('Invoice amount persistence', () => {
     const customerNew = await prisma.customer.create({
       data: {
         taxId: overflowTaxId,
+        legalName: 'Acme Corp',
+        address: 'Av. Siempre Viva 123, CDMX',
         contactEmail: 'test6@test.overflow',
+        creditDays: 30,
       },
     });
 
     await expect(
       prisma.invoice.create({
-        data: {
-          customerId: customerNew.id,
-          totalAmount: '1'.padEnd(14, '0'),
-        },
+        data: invoiceWithTotal(customerNew.id, '1'.padEnd(14, '0')),
       }),
     ).rejects.toMatchObject({
       code: 'P2020',
