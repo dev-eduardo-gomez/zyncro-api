@@ -6,6 +6,10 @@ import { InvoiceRepository } from './domain/ports/invoice-repository.js';
 import { PrismaInvoiceRepository } from './infrastructure/persistence/prisma-invoice-repository.js';
 import { CreateInvoiceUseCase } from './application/create-invoice.use-case.js';
 import { GetInvoiceUseCase } from './application/get-invoice.use-case.js';
+import { RegisterPaymentUseCase } from './application/register-payment.use-case.js';
+import { ListInvoicePaymentsUseCase } from './application/list-invoice-payments.use-case.js';
+import { PaymentRepository } from './domain/ports/payment-repository.js';
+import { PrismaPaymentRepository } from './infrastructure/persistence/prisma-payment-repository.js';
 
 @Module({
   imports: [ClockModule, CustomersModule],
@@ -13,9 +17,15 @@ import { GetInvoiceUseCase } from './application/get-invoice.use-case.js';
   providers: [
     CreateInvoiceUseCase,
     GetInvoiceUseCase,
+    RegisterPaymentUseCase,
+    ListInvoicePaymentsUseCase,
     {
       provide: InvoiceRepository,
       useClass: PrismaInvoiceRepository,
+    },
+    {
+      provide: PaymentRepository,
+      useClass: PrismaPaymentRepository,
     },
   ],
   exports: [],

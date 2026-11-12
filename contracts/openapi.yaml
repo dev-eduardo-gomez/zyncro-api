@@ -737,7 +737,10 @@ components:
       additionalProperties: false
       properties:
         amount:
-          $ref: '#/components/schemas/Money'
+          type: string
+          description: Amount the customer paid, as a decimal string. Must be greater than zero; `0.00` is a validation error.
+          pattern: '^(?!0+\.00$)\d+\.\d{2}$'
+          examples: ['1160.00']
         proofUrl:
           type: string
           format: uri

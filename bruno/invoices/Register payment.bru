@@ -1,0 +1,33 @@
+meta {
+  name: Register payment
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/invoices/:invoiceId/payments
+  body: json
+  auth: inherit
+}
+
+params:path {
+  invoiceId: {{invoiceId}}
+}
+
+body:json {
+  {
+    "amount": "500.00",
+    "proofUrl": "https://proofs.example/transfer-1.pdf"
+  }
+}
+
+assert {
+  res.status: eq 201
+}
+
+docs {
+  Requires `Create invoice` first (uses `invoiceId`).
+  The amount is applied up to the pending balance; any excess becomes credit
+  on the customer (`creditAmount`, R5). Run it a few times to see the invoice
+  go from PARTIAL to PAID.
+}
