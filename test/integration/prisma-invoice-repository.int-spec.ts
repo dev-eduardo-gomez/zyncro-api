@@ -181,6 +181,7 @@ describe('PrismaInvoiceRepository', () => {
           subtotal: '30.00',
           tax: '0.00',
           total: '30.00',
+          balance: '30.00',
           dueDate: new Date('2026-12-31'),
           lineItems: {
             create: [

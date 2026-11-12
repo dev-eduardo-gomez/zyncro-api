@@ -24,7 +24,7 @@ const toDomain = (row: InvoiceWithLineItems): Invoice => {
     subtotal: row.subtotal.toFixed(2),
     tax: row.tax.toFixed(2),
     total: row.total.toFixed(2),
-    balance: row.total.toFixed(2),
+    balance: row.balance.toFixed(2),
     status: row.status,
     dueDate: row.dueDate.toISOString().slice(0, 10),
     createdAt: row.createdAt,
@@ -56,6 +56,7 @@ export class PrismaInvoiceRepository extends InvoiceRepository {
         },
         subtotal: invoice.subtotal,
         tax: invoice.tax,
+        balance: invoice.total,
         total: invoice.total,
       },
       include: {

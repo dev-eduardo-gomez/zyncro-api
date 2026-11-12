@@ -11,6 +11,7 @@ const invoiceWithTotal = (customerId: string, total: string) => ({
   subtotal: total,
   tax: '0',
   total,
+  balance: total,
   dueDate: new Date('2026-12-03'),
 });
 
