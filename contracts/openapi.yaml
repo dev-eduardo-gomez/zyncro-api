@@ -592,6 +592,8 @@ components:
         Overlay computed at read time, never persisted. `PARTIAL` when some but
         not all of the total has been paid; `DUE_SOON` when `PENDING` and the
         due date is within the #8 reminder window (5 days) but not yet overdue.
+        When both apply, `DUE_SOON` wins: the due date is the more urgent fact,
+        and `balance` against `total` still shows the partial payment.
         `null` when neither applies.
       enum: [PARTIAL, DUE_SOON, null]
 
