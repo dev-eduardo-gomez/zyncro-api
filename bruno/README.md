@@ -34,10 +34,10 @@ Requests chain through runtime variables, so run them in this order:
 |---|---|
 | `Auth / Login` | `accessToken` (every other request inherits it as a bearer token) |
 | `Customers / Create customer` | `customerId` |
-| `Invoices / Create invoice` | `invoiceId` |
+| `Invoices / Create invoice` | `invoiceId` (then `Register payment` and `List payments` use it) |
 
 `Create customer` uses `{{$timestamp}}` in `taxId`, so it can be run repeatedly without hitting the `409` duplicate rule.
 
 ## Keeping it in sync
 
-When a task adds an endpoint (payments in #5 T3, invoice listing in #5 T4), add its request here in the same change.
+When a task adds an endpoint (invoice listing in #5 T4), add its request here in the same change.
