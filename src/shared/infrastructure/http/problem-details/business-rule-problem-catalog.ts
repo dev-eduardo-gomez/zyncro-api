@@ -20,6 +20,10 @@ const CATALOG: Readonly<Record<string, CatalogEntry>> = {
     title: 'Duplicate tax id',
     status: HttpStatus.CONFLICT,
   },
+  'invoice-cancelled': {
+    title: 'Invoice is cancelled',
+    status: HttpStatus.CONFLICT,
+  },
 };
 
 const FALLBACK: CatalogEntry = {
