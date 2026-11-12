@@ -45,10 +45,13 @@ model Invoice {
     subtotal Decimal @db.Decimal(15, 2)
     tax Decimal @db.Decimal(15, 2)
     total Decimal @db.Decimal(15, 2)
+    // Pending amount: total minus applied payments. Updated in the same
+    // transaction that records a payment, never negative (R5).
+    balance Decimal @db.Decimal(15, 2)
     status InvoiceStatus @default(PENDING)
     dueDate DateTime @map("due_date") @db.Date
     lineItems InvoiceLineItem[]
-    payment Payment[]
+    payments Payment[]
     createdAt DateTime @map("created_at") @default(now())
     updatedAt DateTime @map("updated_at") @updatedAt
 
@@ -76,12 +79,19 @@ model InvoiceLineItem {
 model Payment {
     id String @id @default(uuid()) @db.Uuid
     invoiceId String @map("invoice_id") @db.Uuid
-    paidAmount Decimal @map("paid_amount") @db.Decimal(15,2)
+    // What the customer paid = appliedAmount + creditAmount.
+    amount Decimal @db.Decimal(15, 2)
+    // Portion that lowered the invoice balance.
+    appliedAmount Decimal @map("applied_amount") @db.Decimal(15, 2)
+    // Excess over the pending balance, added to the customer's credit (R5).
+    creditAmount Decimal @map("credit_amount") @db.Decimal(15, 2)
     proofUrl String? @map("proof_url") @db.Text
     createdAt DateTime @map("created_at") @default(now())
 
     invoice Invoice @relation(fields: [invoiceId], references: [id])
 
+    // GET /invoices/{id}/payments lists them oldest first.
+    @@index([invoiceId, createdAt])
     @@map("payments")
 }
 
