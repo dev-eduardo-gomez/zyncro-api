@@ -1,6 +1,7 @@
 export const PROBLEM_JSON_CONTENT_TYPE = 'application/problem+json';
 
-export const PROBLEM_TYPE_BASE_URI = 'https://cobrix.io/errors';
+export const PROBLEM_TYPE_BASE_URI =
+  'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md';
 
 export const DEFAULT_PROBLEM_TYPE = 'about:blank';
 

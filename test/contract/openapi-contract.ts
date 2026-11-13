@@ -55,7 +55,7 @@ export class ContractViolation extends Error {
   override name = 'ContractViolation';
 }
 
-const DOCUMENT_ID = 'https://cobrix.io/contracts/openapi.json';
+const DOCUMENT_ID = 'https://github.com/dev-eduardo-gomez/zyncro-api/contracts/openapi.json';
 
 const OPENAPI_KEYWORDS = [
   'openapi',
@@ -234,7 +234,7 @@ export class OpenApiContract {
   }
 }
 
-export const cobrixContract = OpenApiContract.fromFile(
+export const zyncroContract = OpenApiContract.fromFile(
   'contracts/openapi.yaml',
 );
 
@@ -242,4 +242,4 @@ export const assertMatchesContract = (
   method: HttpMethod,
   path: string,
   response: ContractResponse,
-): void => cobrixContract.assertResponse(method, path, response);
+): void => zyncroContract.assertResponse(method, path, response);

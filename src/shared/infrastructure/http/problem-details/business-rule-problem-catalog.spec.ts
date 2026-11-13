@@ -5,7 +5,7 @@ describe('toBusinessRuleProblem', () => {
     const problem = toBusinessRuleProblem('maker-checker-violation');
 
     expect(problem.type).toBe(
-      'https://cobrix.io/errors/business-rule/maker-checker-violation',
+      'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#maker-checker-violation',
     );
   });
 
@@ -13,7 +13,7 @@ describe('toBusinessRuleProblem', () => {
     const problem = toBusinessRuleProblem('maker-checker-violation');
 
     expect(problem).toEqual({
-      type: 'https://cobrix.io/errors/business-rule/maker-checker-violation',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#maker-checker-violation',
       title: 'Maker-checker rule violated',
       status: 403,
     });
@@ -23,7 +23,7 @@ describe('toBusinessRuleProblem', () => {
     const problem = toBusinessRuleProblem('credit-limit-exceeded');
 
     expect(problem).toEqual({
-      type: 'https://cobrix.io/errors/business-rule/credit-limit-exceeded',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#credit-limit-exceeded',
       title: 'Business rule violated',
       status: 422,
     });

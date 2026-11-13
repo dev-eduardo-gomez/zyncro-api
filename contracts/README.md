@@ -1,6 +1,6 @@
 # API contract
 
-`openapi.yaml` (OpenAPI 3.1) is the source of truth for the Cobrix HTTP API.
+`openapi.yaml` (OpenAPI 3.1) is the source of truth for the Zyncro HTTP API.
 A route that is not in the contract must not exist in the code.
 
 ## Workflow per issue
@@ -16,8 +16,9 @@ A route that is not in the contract must not exist in the code.
 - Every error is RFC 9457 Problem Details (`application/problem+json`) with the
   `instance` and `timestamp` extensions. Reuse `components.responses` (`ValidationFailed`,
   `Unauthorized`, `InternalError`) instead of redeclaring them.
-- Problem `type`: `https://cobrix.io/errors/validation`,
-  `https://cobrix.io/errors/business-rule/{code}`, or `about:blank`.
+- Problem `type`: `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation`,
+  `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#{code}`, or `about:blank`.
+  Every code has its own heading in [`docs/errors.md`](../docs/errors.md).
 - Response schemas set `additionalProperties: false`, so a renamed or leaked field
   fails the contract tests.
 - Request and response examples live in the contract (`example` on each media type).

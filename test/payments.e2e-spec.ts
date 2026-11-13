@@ -174,7 +174,7 @@ describe('Payments (e2e)', () => {
     expect(response.status).toBe(409);
     expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     expect(response.body.type).toBe(
-      'https://cobrix.io/errors/business-rule/invoice-cancelled',
+      'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#invoice-cancelled',
     );
     expect(await prisma.payment.count({ where: { invoiceId } })).toBe(0);
   });
