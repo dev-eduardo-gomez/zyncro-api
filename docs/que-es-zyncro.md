@@ -67,7 +67,7 @@ Lo que un usuario autenticado puede hacer con la API hoy:
 | **Pagos** | Parciales, completos y sobrepagos. Dos pagos simultáneos sobre la misma factura no se pisan. |
 | **Estados** | Pendiente, Pagada, Vencida, Cancelada y En disputa (guardados); Parcial y Por vencer (calculados al consultar). |
 | **Seguridad** | Todo requiere token salvo el login; contraseñas con argon2id; errores con un formato estándar (RFC 9457). |
-| **En construcción** | Listado de facturas con filtros (estado, cliente, vencimiento, monto) y paginación estable (#5, T4). |
+| **Listado de facturas** | Filtros combinables (estado, cliente, vencimiento, monto) y paginación por cursor: una factura nueva no hace que se salte ni se repita ninguna mientras recorres las páginas. |
 
 ### Lo que todavía no hace
 
@@ -92,7 +92,7 @@ Orden de construcción y estado:
 |---|---|---|
 | #1-#4 | Infraestructura local, modelo de datos, errores estándar, autenticación y roles | ✅ |
 | #43 | Contrato OpenAPI como fuente de verdad | ✅ |
-| #5 | Clientes, facturas y pagos | 🚧 Falta el listado (T4) |
+| #5 | Clientes, facturas, pagos y listado | ✅ |
 | #22 | Bitácora de auditoría inmutable | ⏳ |
 | #21 | Administración de usuarios | ⏳ |
 | #8 | Recordatorios por correo (T-5, T-2, T-0, T+3, T+7) y marcado de vencidas | ⏳ |
@@ -135,7 +135,7 @@ Depende de proveedores externos o solo agrega análisis:
 
 ## Nombres
 
-El repositorio y la API se llaman **Zyncro**. Varios documentos y el contrato usan **Cobrix**, el nombre de trabajo original: el `title` del contrato, la API `cobrix` en `redocly.yaml` y el dominio de los tipos de error `https://cobrix.io/errors`. Son el mismo producto.
+El repositorio, el contrato y la API se llaman **Zyncro**. **Cobrix** fue el nombre de trabajo original, y todavía aparece en documentos históricos (`odd/`, los borradores de `docs/*.md.md`) y en la colección de Bruno. Son el mismo producto.
 
 ## Para seguir leyendo
 

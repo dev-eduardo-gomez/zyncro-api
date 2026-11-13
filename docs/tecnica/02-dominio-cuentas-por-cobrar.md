@@ -92,13 +92,15 @@ El `creditAmount` de cada pago se suma a `Customer.creditBalance`. Ese crédito 
 
 Un monto de `0.00` es un error de validación (400) y no llega al dominio.
 
-## Listado (T4, en curso)
+## Listado (T4)
 
 `InvoiceRepository.findPage` recibe `{ filter, afterFolio, limit }` y devuelve `{ items, nextFolio }`:
 
 - **Orden:** `folio` descendente (la más nueva primero). `folio` es único y crece con cada factura.
 - **Cursor:** el folio de la última factura de la página; la página siguiente pide `folio < cursor`. Una factura nueva recibe un folio mayor, así que nunca se mete en páginas que el cliente todavía no ha visto (R8).
 - **Filtros** (`InvoiceFilter`): `status`, `customerId`, `dueDateFrom`/`dueDateTo`, `minTotal`/`maxTotal`. Todos son opcionales, se combinan con AND y los rangos incluyen ambos extremos. El rango de monto compara contra `total`, no contra `balance`.
+- **Página siguiente:** el adaptador pide `limit + 1` filas. Si llega la fila extra, hay otra página y `nextFolio` es el folio de la última factura mostrada; si no, `nextFolio` es `null`.
+- **Estado derivado:** `ListInvoicesUseCase` calcula `derivedStatus` de todas las facturas de la página con una sola lectura del reloj, así todas se juzgan contra el mismo día.
 
 ## Errores de negocio
 
