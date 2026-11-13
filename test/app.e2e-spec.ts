@@ -8,8 +8,6 @@ if (existsSync('.env')) process.loadEnvFile();
 
 const PROBLEM_JSON = /^application\/problem\+json/;
 
-// The contract (contracts/openapi.yaml) is the source of truth: a route that
-// is not in it must not exist. GET / was the Nest scaffold's placeholder.
 describe('Root route (e2e)', () => {
   let app: INestApplication;
 

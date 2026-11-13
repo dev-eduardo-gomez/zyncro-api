@@ -19,16 +19,12 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   ],
 })
 export class AppModule {
-  // Decided at bootstrap, after the .env file is loaded: the @Module()
-  // metadata above is evaluated on import, before any environment exists.
   static forRoot(observe: ObserveCredentials | null): DynamicModule {
     if (observe === null) return { module: AppModule };
 
     return {
       module: AppModule,
       imports: [
-        // Distributed tracing, auto-correlated logs, request/job metrics, error
-        // telemetry, alarms, and more. Sign up at https://observe.nestjs.com
         ObserveModule.forRoot({ ...observe, serviceId: 'zyncro-api' }),
       ],
     };

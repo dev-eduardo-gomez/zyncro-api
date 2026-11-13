@@ -12,7 +12,6 @@ if (existsSync('.env')) process.loadEnvFile();
 
 const PROBLEM_JSON = /^application\/problem\+json/;
 
-// User ids are UUIDs (prisma/schema.prisma), as the contract declares.
 const USER_ID = '8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70';
 
 @Controller('e2e-probe')

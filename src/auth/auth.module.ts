@@ -45,7 +45,6 @@ import { RolesGuard } from './infrastructure/security/roles.guard.js';
       provide: AccessTokenIssuer,
       useClass: JwtAccessTokenIssuer,
     },
-    // Global guards run in registration order: authenticate first, then authorize.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

@@ -35,7 +35,6 @@ class CreateInvoiceDto {
   currency: string;
 }
 
-// Public: these routes exercise Problem Details, not authentication.
 @Public()
 @Controller('e2e-probe')
 class ProbeController {

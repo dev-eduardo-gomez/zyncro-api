@@ -28,7 +28,6 @@ export interface InvoiceAmounts {
 export interface NewInvoice extends InvoiceAmounts {
   readonly customerId: string;
   readonly currency: string;
-  // YYYY-MM-DD
   readonly dueDate: string;
 }
 

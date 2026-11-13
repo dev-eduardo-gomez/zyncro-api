@@ -77,7 +77,6 @@ describe('allocatePayment', () => {
   });
 
   it('keeps decimal amounts exact, without binary floating-point drift (R1)', () => {
-    // 0.30 - 0.10 is 0.19999999999999998 with JavaScript numbers.
     expect(
       allocatePayment({ ...unpaid, total: '0.30', balance: '0.30' }, '0.10'),
     ).toEqual({

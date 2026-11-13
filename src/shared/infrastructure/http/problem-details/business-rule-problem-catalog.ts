@@ -9,8 +9,6 @@ export interface BusinessRuleProblem {
 
 type CatalogEntry = Omit<BusinessRuleProblem, 'type'>;
 
-// Codes that need a status or title other than the fallback. Register a code
-// here when its domain rule is introduced.
 const CATALOG: Readonly<Record<string, CatalogEntry>> = {
   'maker-checker-violation': {
     title: 'Maker-checker rule violated',

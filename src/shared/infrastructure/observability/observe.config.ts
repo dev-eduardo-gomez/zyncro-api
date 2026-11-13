@@ -3,8 +3,6 @@ export interface ObserveCredentials {
   appSecret: string;
 }
 
-// Telemetry is optional: no credentials means it is switched off on purpose.
-// Only one credential is a misconfiguration, so the app refuses to start.
 export const loadObserveCredentials = (
   env: Record<string, string | undefined>,
 ): ObserveCredentials | null => {
