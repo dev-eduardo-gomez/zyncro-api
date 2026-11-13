@@ -9,8 +9,6 @@ import { Decimal } from 'decimal.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 
-// A test-only decision, so these tests pin the adapter (locking, writes,
-// atomicity) and not the domain rule, which allocate-payment.spec covers.
 const splitUpToBalance =
   (amount: string): AllocatePayment =>
   (invoice: InvoicePaymentState) => {
@@ -32,7 +30,6 @@ describe('PrismaPaymentRepository', () => {
   const taxIdPrefix = `PAY-INT-${Date.now()}`;
   let sequence = 0;
 
-  // Each invoice gets its own customer, so credit balances start at zero.
   const createInvoice = async (total = '1160.00') => {
     sequence += 1;
     const customer = await prisma.customer.create({
@@ -188,8 +185,6 @@ describe('PrismaPaymentRepository', () => {
     it('never applies the same balance twice under concurrent payments', async () => {
       const { invoiceId, customerId } = await createInvoice();
 
-      // Without a row lock both transactions read balance 1160.00, both apply
-      // it in full, and the second payment's credit is lost.
       const payments = await Promise.all([
         repository.register(
           invoiceId,

@@ -163,8 +163,6 @@ describe('OpenApiContract', () => {
   });
 
   it('rejects a text body when the response declares no content', () => {
-    // Supertest leaves `body` as {} for non-JSON responses; the raw text is
-    // what reveals the body.
     expect(() =>
       contract.assertResponse('delete', '/widgets/{id}', {
         status: 204,

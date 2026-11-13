@@ -10,21 +10,14 @@ import {
 
 if (existsSync('.env')) process.loadEnvFile();
 
-// The contract and the guards must agree: every operation the contract
-// protects (it inherits the global bearerAuth or declares its own) has to
-// reject a request without a valid token, and declare that 401.
 const protectedOperations = cobrixContract
   .operations()
   .filter((operation) => operation.requiresAuth);
 
-// The other direction: an operation the contract declares public
-// (`security: []`) must not be blocked by the guard.
 const publicOperations = cobrixContract
   .operations()
   .filter((operation) => !operation.requiresAuth);
 
-// Path parameters only need a well-formed value: the guard runs before any
-// lookup, so the resource does not have to exist.
 const PATH_PARAMETER_VALUE = '8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70';
 const toUrl = (path: string) =>
   path.replaceAll(/\{[^}]+\}/g, PATH_PARAMETER_VALUE);

@@ -11,8 +11,6 @@ import type {
 } from '../domain/models/payment.js';
 import { InvoiceCancelled } from '../domain/errors/invoice-cancelled.error.js';
 
-// Calls `allocate` with a fixed invoice state, the way the real adapter calls
-// it under lock, and builds the stored payment from the decision it returns.
 class FakePaymentRepository extends PaymentRepository {
   constructor(private readonly invoices: Map<string, InvoicePaymentState>) {
     super();

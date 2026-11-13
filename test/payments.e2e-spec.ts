@@ -57,8 +57,6 @@ describe('Payments (e2e)', () => {
       `Bearer ${token}`,
     );
 
-  // A fresh customer (30 credit days, so never DUE_SOON) with one invoice of
-  // total 1160.00.
   const createInvoice = async () => {
     sequence += 1;
     const customer = await authed('post', '/customers').send({
@@ -165,7 +163,6 @@ describe('Payments (e2e)', () => {
 
   it('rejects a payment on a CANCELLED invoice with 409 and stores nothing (R4)', async () => {
     const { invoiceId } = await createInvoice();
-    // No endpoint cancels an invoice yet (see the task's known gaps).
     await prisma.invoice.update({
       where: { id: invoiceId },
       data: { status: 'CANCELLED' },

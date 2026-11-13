@@ -8,7 +8,6 @@ import {
   Min,
 } from 'class-validator';
 
-// Money travels as a string so its decimals stay exact (R1).
 const MONEY = /^\d+\.\d{2}$/;
 
 export class InvoiceLineItemDto {
