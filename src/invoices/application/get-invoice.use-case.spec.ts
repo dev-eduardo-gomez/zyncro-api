@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { GetInvoiceUseCase } from './get-invoice.use-case.js';
 import { InvoiceRepository } from '../domain/ports/invoice-repository.js';
-import type { Invoice } from '../domain/models/invoice.js';
+import type { Invoice, InvoicePage } from '../domain/models/invoice.js';
 import { Clock } from '../../shared/domain/ports/clock.js';
 
 class FixedClock extends Clock {
@@ -21,6 +21,10 @@ class FakeInvoiceRepository extends InvoiceRepository {
 
   findById(id: string): Promise<Invoice | null> {
     return Promise.resolve(this.invoice?.id === id ? this.invoice : null);
+  }
+
+  findPage(): Promise<InvoicePage> {
+    throw new Error('not used by GetInvoiceUseCase');
   }
 }
 
