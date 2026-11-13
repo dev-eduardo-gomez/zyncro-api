@@ -13,7 +13,7 @@ Este documento describe el proyecto **como es hoy** y hacia dónde va. Los docum
 | **Sector** | Software financiero B2B (fintech de gestión) |
 | **Nicho** | Cuentas por cobrar (*accounts receivable*, AR) y cobranza |
 | **Modelo de uso** | Una sola empresa emisora usa la plataforma para su propia cartera de clientes. No es multi-empresa (*multi-tenant*). |
-| **Referencia de producto** | Plataformas de cobranza como cobrix.co, pero sin atarse a los bancos de un país |
+| **Referencia de producto** | Plataformas de cobranza B2B ya existentes, pero sin atarse a los bancos de un país |
 | **Forma** | API REST (NestJS + PostgreSQL). La interfaz de usuario queda fuera de este repositorio. |
 
 ## El problema
@@ -132,10 +132,6 @@ Depende de proveedores externos o solo agrega análisis:
 3. **Una empresa, bien servida.** Primero una instalación por empresa; multi-empresa no es objetivo.
 4. **Sin amarrarse a un país.** Bancos, proveedores de pago y autoridades fiscales se conectan por puertos con adaptadores intercambiables.
 5. **El contrato manda.** La API se diseña primero en `contracts/openapi.yaml`, y el código lo cumple.
-
-## Nombres
-
-El repositorio, el contrato y la API se llaman **Zyncro**. **Cobrix** fue el nombre de trabajo original, y todavía aparece en documentos históricos (`odd/`, los borradores de `docs/*.md.md`) y en la colección de Bruno. Son el mismo producto.
 
 ## Para seguir leyendo
 

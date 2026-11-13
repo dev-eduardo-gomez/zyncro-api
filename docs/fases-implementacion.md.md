@@ -1,4 +1,4 @@
-# Archivo: cobrix-fases-implementacion.md
+# Archivo: zyncro-fases-implementacion.md
 # Hoja de Ruta Ampliada: 10 Fases End-to-End
 
 ## FASE 1: Monorepo Setup & Entorno Docker

@@ -1,8 +1,8 @@
-# Cobrix backlog: API-first consolidation proposal (2026-10-28)
+# Zyncro backlog: API-first consolidation proposal (2026-10-28)
 
 **Applied on GitHub on 2026-10-28.** The NEW contract issue is #43. V1 open: #43, #22, #21, #5, #35, #6, #8, #9, #7, #10, #12. V2 open: #23, #27, #29, #31, #33, #41. Build order: #43 → #22 → #21 → #5 → #35 → #6 → #8 → #9 → #7 → #10 → #12. #22 moved ahead of #21 because user changes are audited.
 
-**Scope reduction (2026-11-02):** the product pivots to a Cobrix-like collections/AR platform, not a full ERP, and CFDI/PAC/SAT fiscal compliance is deferred for V1 (see "Scope reduction" section below). Closed as not planned: #6, #31, #33, #41. Deferred to V2: #35 (now `[V2] Emitir y cancelar facturas CFDI 4.0`). V1 open is now: #43, #22, #21, #5, #8, #9, #7, #10, #12. Build order: #43 → #22 → #21 → #5 → #8 → #9 → #7 → #10 → #12.
+**Scope reduction (2026-11-02):** the product pivots to a collections/AR platform, not a full ERP, and CFDI/PAC/SAT fiscal compliance is deferred for V1 (see "Scope reduction" section below). Closed as not planned: #6, #31, #33, #41. Deferred to V2: #35 (now `[V2] Emitir y cancelar facturas CFDI 4.0`). V1 open is now: #43, #22, #21, #5, #8, #9, #7, #10, #12. Build order: #43 → #22 → #21 → #5 → #8 → #9 → #7 → #10 → #12.
 
 ## Criteria
 1. **Source of scope:** the original spec (`docs/documentacion-general.md.md` §3) plus the legal and fiscal obligations (CFDI 4.0, auditing). Issues that came only from the Pencil views are dropped, because the UX/views work was abandoned on 2026-10-28.
@@ -71,9 +71,9 @@
 
 ## Scope reduction (2026-11-02)
 
-User decision, after analyzing cobrix.co as the product reference: the product narrows to a Cobrix-like adaptable collections/AR platform for a single issuing company (no multi-tenant, confirmed), not a full ERP, and fiscal/tax-authority compliance is out of scope for V1.
+User decision, after analyzing an existing collections platform as the product reference: the product narrows to an adaptable collections/AR platform for a single issuing company (no multi-tenant, confirmed), not a full ERP, and fiscal/tax-authority compliance is out of scope for V1.
 
-1. **Closed as not planned** (accounts payable / suppliers / payroll — never part of Cobrix's feature set): #6, #31, #33, #41.
+1. **Closed as not planned** (accounts payable / suppliers / payroll — never part of the reference collections platform's feature set): #6, #31, #33, #41.
 2. **Deferred to V2**, not closed: #35 (`[V2] Emitir y cancelar facturas CFDI 4.0`). Reason given by the user: stamping (CFDI or any tax authority) requires contracting and vetting a certification provider (PAC or equivalent), which is a real investment they don't want to make yet. Revisit once a target market/country is chosen.
 3. **#5 edited**: dropped CFDI-only fields (RFC-specific tax regime, fiscal ZIP, default CFDI use) in favor of a generic `taxId`/address; dropped the REP 2.0 payment-complement rule (R7); invoices are internal documents for V1, not fiscally stamped.
-4. Adaptability principle (see conversation, not yet written into an issue): when bank/payment-provider integrations are designed (#9, #23 V2, #41 was the trilateral case but is now closed), the bank/PSP must sit behind a generic port with swappable adapters — never hardcoded to one country's banks, unlike cobrix.co's Venezuela-only bank list. Apply this when #9's contract is designed.
+4. Adaptability principle (see conversation, not yet written into an issue): when bank/payment-provider integrations are designed (#9, #23 V2, #41 was the trilateral case but is now closed), the bank/PSP must sit behind a generic port with swappable adapters — never hardcoded to one country's banks, unlike the reference platform's Venezuela-only bank list. Apply this when #9's contract is designed.

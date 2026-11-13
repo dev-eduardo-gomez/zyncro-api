@@ -1,9 +1,9 @@
-# Cobrix design v1/v2 in Pencil + V2 issue backlog
-Objective: new Pencil file with V1 views matching issues #1-#13 and V2 views from the original designs; derive V2 issues. File: `C:/Users/ofima/Developer/Pencil/ERP Cobrix v2.pen` (outside the repo).
+# Zyncro design v1/v2 in Pencil + V2 issue backlog
+Objective: new Pencil file with V1 views matching issues #1-#13 and V2 views from the original designs; derive V2 issues. File: the v2 Pencil design file (local, outside the repo).
 Branch: none (design + GitHub issues only). Delivery: issues published only after user confirmation. Test runner: n/a (visual readback via screenshots).
 
 ## Specs
-- S1: "toma los diseños como fuente y deriva las issues nuevas" — derive new issues from the Pencil designs (`ERP Cobrix v1.pen`).
+- S1: "toma los diseños como fuente y deriva las issues nuevas" — derive new issues from the Pencil designs (the v1 Pencil design file).
 - S2: "lo que tenemos actualmente en la API sea la version 1, en base a eso crea unas nuevas vistas que se ajusten a lo que tenemos definido en todas las issues" — V1 views show only what issues #1-#13 define.
 - S3: "lo que se deriva como nuevas sea la version 2 con las demas vistas implementadas y ya definidas" — V2 = the remaining views, backed by the derived issues.
 - S4: "quiero que hagas otra version de pencil, claro que mucho mejor visualmente pero sin sobre cargar las vistas" — a new Pencil file, visually better, without overloading views.
