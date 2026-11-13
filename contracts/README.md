@@ -18,7 +18,8 @@ A route that is not in the contract must not exist in the code.
   `Unauthorized`, `InternalError`) instead of redeclaring them.
 - Problem `type`: `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation`,
   `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#{code}`, or `about:blank`.
-  Every code has its own heading in [`docs/errors.md`](../docs/errors.md).
+  Every catalogued code has its own heading in [`docs/errors.md`](../docs/errors.md); add one
+  when you add a code to the catalog. Uncatalogued codes fall back to 422 without a heading.
 - Response schemas set `additionalProperties: false`, so a renamed or leaked field
   fails the contract tests.
 - Request and response examples live in the contract (`example` on each media type).

@@ -55,7 +55,8 @@ export class ContractViolation extends Error {
   override name = 'ContractViolation';
 }
 
-const DOCUMENT_ID = 'https://github.com/dev-eduardo-gomez/zyncro-api/contracts/openapi.json';
+const DOCUMENT_ID =
+  'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/contracts/openapi.yaml';
 
 const OPENAPI_KEYWORDS = [
   'openapi',
