@@ -64,6 +64,11 @@ export interface InvoicePage {
   readonly nextFolio: number | null;
 }
 
+export interface InvoiceViewPage {
+  readonly items: InvoiceView[];
+  readonly nextFolio: number | null;
+}
+
 export interface CreateInvoiceRequest {
   readonly customerId: string;
   readonly currency: string;
