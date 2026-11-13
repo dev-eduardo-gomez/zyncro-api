@@ -59,7 +59,7 @@ const document: OpenApiDocument = {
 
 const widget = {
   id: '8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70',
-  ownerEmail: 'owner@cobrix.io',
+  ownerEmail: 'owner@example.com',
 };
 
 const json = (status: number, body: unknown, type = 'application/json') => ({
@@ -163,8 +163,6 @@ describe('OpenApiContract', () => {
   });
 
   it('rejects a text body when the response declares no content', () => {
-    // Supertest leaves `body` as {} for non-JSON responses; the raw text is
-    // what reveals the body.
     expect(() =>
       contract.assertResponse('delete', '/widgets/{id}', {
         status: 204,

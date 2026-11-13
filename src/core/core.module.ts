@@ -10,9 +10,6 @@ import { validationExceptionFactory } from '../shared/infrastructure/http/proble
       provide: APP_PIPE,
       useFactory: () =>
         new ValidationPipe({
-          // Request bodies are closed (`additionalProperties: false` in the
-          // contract): a property the DTO does not declare is a 400, never
-          // silently forwarded to persistence.
           whitelist: true,
           forbidNonWhitelisted: true,
           exceptionFactory: validationExceptionFactory,

@@ -58,7 +58,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
 
     if (exception instanceof RequestValidationException) {
       return {
-        type: `${PROBLEM_TYPE_BASE_URI}/validation`,
+        type: `${PROBLEM_TYPE_BASE_URI}#validation`,
         title: 'Request validation failed',
         status: exception.getStatus(),
         detail: exception.message,
@@ -81,8 +81,6 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       };
     }
 
-    // Server-side failures may carry internals (connection strings, SQL,
-    // stack traces): log them, never send them to the client.
     this.logger.error(
       `Unhandled exception on ${method} ${url}`,
       exception instanceof Error ? exception.stack : String(exception),

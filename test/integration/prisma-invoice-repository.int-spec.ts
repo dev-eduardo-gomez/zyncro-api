@@ -56,7 +56,6 @@ describe('PrismaInvoiceRepository', () => {
   });
 
   afterAll(async () => {
-    // Line items go with their invoice (onDelete: Cascade).
     await prisma.invoice.deleteMany({
       where: { customer: { taxId: { startsWith: taxIdPrefix } } },
     });
@@ -142,7 +141,6 @@ describe('PrismaInvoiceRepository', () => {
     it('persists nothing when a line item cannot be stored', async () => {
       const before = await prisma.invoice.count({ where: { customerId } });
 
-      // Decimal(12,4) holds at most 8 integer digits: this line overflows.
       await expect(
         repository.create(
           newInvoice({
@@ -181,6 +179,7 @@ describe('PrismaInvoiceRepository', () => {
           subtotal: '30.00',
           tax: '0.00',
           total: '30.00',
+          balance: '30.00',
           dueDate: new Date('2026-12-31'),
           lineItems: {
             create: [

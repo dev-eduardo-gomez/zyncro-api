@@ -3,10 +3,6 @@ import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { parse } from 'yaml';
 
-// Validates real HTTP responses against the OpenAPI 3.1 contract, the source
-// of truth for the API. OpenAPI 3.1 schemas are JSON Schema 2020-12, so Ajv
-// compiles them directly from the registered document.
-
 export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 const HTTP_METHODS: readonly HttpMethod[] = [
@@ -21,12 +17,9 @@ export interface ContractResponse {
   status: number;
   headers: Record<string, unknown>;
   body: unknown;
-  // Raw body as sent; supertest sets `body` to {} for non-JSON responses.
   text?: string;
 }
 
-// Each requirement maps a security scheme name to its scopes. An empty
-// requirement ({}) makes authentication optional.
 type SecurityRequirement = Record<string, string[]>;
 
 export interface ContractOperation {
@@ -62,12 +55,9 @@ export class ContractViolation extends Error {
   override name = 'ContractViolation';
 }
 
-const DOCUMENT_ID = 'https://cobrix.io/contracts/openapi.json';
+const DOCUMENT_ID =
+  'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/contracts/openapi.yaml';
 
-// OpenAPI keywords that JSON Schema does not define: the document's top-level
-// fields (Ajv compiles the registered document as a schema) and the
-// schema-level extras. Registered as no-op keywords so strict mode accepts
-// them while still rejecting typos inside the schemas themselves.
 const OPENAPI_KEYWORDS = [
   'openapi',
   'info',
@@ -83,7 +73,6 @@ const OPENAPI_KEYWORDS = [
   'xml',
 ];
 
-// RFC 6901: "~" and "/" must be escaped inside a JSON Pointer segment.
 const escapePointer = (segment: string): string =>
   segment.replaceAll('~', '~0').replaceAll('/', '~1');
 
@@ -147,7 +136,6 @@ export class OpenApiContract {
     const mediaType = String(response.headers['content-type'] ?? '')
       .split(';')[0]
       .trim();
-    // Media types are case-insensitive (RFC 9110 section 8.3.1).
     const declaredMediaType = Object.keys(declared.content).find(
       (key) => key.toLowerCase() === mediaType.toLowerCase(),
     );
@@ -168,9 +156,6 @@ export class OpenApiContract {
       );
   }
 
-  // Every operation, with whether it requires authentication. An operation's
-  // own `security` replaces the global one; an empty list (or an empty
-  // requirement) means no authentication is required.
   operations(): ContractOperation[] {
     return Object.entries(this.document.paths).flatMap(([path, pathItem]) =>
       HTTP_METHODS.flatMap((method) => {
@@ -187,11 +172,8 @@ export class OpenApiContract {
     );
   }
 
-  // Compiles every response schema so a schema Ajv cannot compile fails fast,
-  // before any e2e test depends on it.
   compileAllResponseSchemas(): void {
     for (const [path, pathItem] of Object.entries(this.document.paths)) {
-      // A path item also holds shared fields such as `parameters`.
       for (const method of HTTP_METHODS) {
         const operation = pathItem[method];
         if (!operation) continue;
@@ -209,7 +191,6 @@ export class OpenApiContract {
     }
   }
 
-  // Exact status first, then the OpenAPI range ("4XX"), then "default".
   private findStatusKey(
     responses: Record<string, ResponseObject>,
     status: number,
@@ -254,8 +235,7 @@ export class OpenApiContract {
   }
 }
 
-// The Cobrix contract, loaded once per test file.
-export const cobrixContract = OpenApiContract.fromFile(
+export const zyncroContract = OpenApiContract.fromFile(
   'contracts/openapi.yaml',
 );
 
@@ -263,4 +243,4 @@ export const assertMatchesContract = (
   method: HttpMethod,
   path: string,
   response: ContractResponse,
-): void => cobrixContract.assertResponse(method, path, response);
+): void => zyncroContract.assertResponse(method, path, response);

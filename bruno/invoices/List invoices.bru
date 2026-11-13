@@ -1,0 +1,25 @@
+meta {
+  name: List invoices
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/invoices?customerId={{customerId}}&status=PENDING&limit=20
+  body: none
+  auth: inherit
+}
+
+params:query {
+  customerId: {{customerId}}
+  status: PENDING
+  limit: 20
+  ~dueDateFrom: 2026-11-01
+  ~dueDateTo: 2026-12-31
+  ~minAmount: 100.00
+  ~maxAmount: 5000.00
+}
+
+assert {
+  res.status: eq 200
+}

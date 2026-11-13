@@ -1,4 +1,4 @@
-# Archivo: cobrix-backend-infra.md
+# Archivo: zyncro-backend-infra.md
 # Especificación Técnica Backend, Base de Datos e Infraestructura
 
 ## 1. Stack Tecnológico Backend

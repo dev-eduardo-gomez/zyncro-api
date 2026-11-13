@@ -1,19 +1,76 @@
+<div align="center">
+
 # Zyncro API
 
-Backend de **Zyncro**, un ERP financiero enfocado en automatizar Cuentas por Cobrar (AR), Cuentas por Pagar (AP) y Nómina. Construido con [NestJS](https://nestjs.com).
+**El motor open source de cuentas por cobrar para empresas que venden a crédito.**
+Emite facturas, controla saldos, registra pagos parciales y convierte los sobrepagos en crédito a favor, con precisión al centavo. Autohospedable y con licencia AGPL-3.0.
 
-La documentación de producto vive en [`docs/`](docs/).
+<img src="docs/assets/zyncro-hero.png" alt="Zyncro: el motor open source de cuentas por cobrar. Una tabla de facturas por cobrar con estados vencida, parcial, pagada y en disputa, y un aviso de sobrepago registrado como crédito a favor." width="100%">
 
-## Requisitos
+<sub>Ilustración: Zyncro es una API sin interfaz gráfica. La tabla representa un cliente que la consume.</sub>
 
-| Herramienta                    | Para qué                          |
-| ------------------------------ | --------------------------------- |
-| Node.js + npm                  | Ejecutar la API y los tests       |
-| Docker (con Docker Compose v2) | Levantar la infraestructura local |
+[![NestJS](https://img.shields.io/badge/NestJS_12-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI_3.1-6BA539?style=for-the-badge&logo=openapiinitiative&logoColor=white)](contracts/openapi.yaml)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-663399?style=for-the-badge)](LICENSE)
 
-## Arquitectura local
+[Qué es Zyncro](docs/que-es-zyncro.md) · [Documentación técnica](docs/tecnica/README.md) · [Contrato de la API](contracts/openapi.yaml) · [Errores](docs/errors.md)
 
-La API corre **en tu máquina**; la infraestructura corre en contenedores con Docker Compose. Todos los puertos se publican solo en `127.0.0.1`, así que no son accesibles desde la red.
+</div>
+
+---
+
+## 💡 ¿Qué es Zyncro?
+
+Zyncro es el backend de una plataforma de cobranza B2B para **una empresa emisora**. Reemplaza las hojas de cálculo con una sola fuente de verdad para la cartera: quién debe qué, desde cuándo y cuánto ha pagado.
+
+- 🧾 **Facturas con cálculo automático:** partidas con cantidad, precio e impuesto; el servidor calcula subtotal, impuesto y total, asigna un **folio único y secuencial** a cada factura y la fecha de vencimiento según los días de crédito del cliente.
+- 💳 **Pagos flexibles:** completos, parciales y sobrepagos. El excedente se guarda como **crédito a favor** del cliente. Dos pagos simultáneos sobre la misma factura no se pisan.
+- 📊 **Estados claros:** `PENDING`, `PAID`, `OVERDUE`, `CANCELLED` y `DISPUTED`, más los estados calculados `PARTIAL` y `DUE_SOON` en cada consulta.
+- 🎯 **Dinero exacto:** cero puntos flotantes. Los montos viajan como texto decimal, se calculan en base 10 y el redondeo está documentado.
+- 🔒 **Seguro por defecto:** todas las rutas requieren JWT salvo el login, las contraseñas se guardan con argon2id y los errores siguen un formato estándar ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)).
+
+> Las facturas son documentos internos: Zyncro **no** timbra ante una autoridad fiscal en la versión 1. Más detalles en [Qué es Zyncro](docs/que-es-zyncro.md).
+
+---
+
+## 🛠️ Stack
+
+| Área | Tecnología |
+|---|---|
+| Framework | [NestJS 12](https://nestjs.com/) · TypeScript (ES modules) |
+| Base de datos | [PostgreSQL 16](https://www.postgresql.org/) · [Prisma ORM 7](https://www.prisma.io/) |
+| Dinero | [`decimal.js`](https://mikemcl.github.io/decimal.js/) |
+| Seguridad | JWT (Passport) · argon2id |
+| Contrato | OpenAPI 3.1, **contrato primero**, validado en cada test e2e |
+| Tests y calidad | Vitest · Supertest · AJV · oxlint · Redocly |
+| Infraestructura local | Docker Compose: PostgreSQL, Redis y Mailpit |
+
+---
+
+## 🏗️ Arquitectura
+
+<img src="docs/assets/zyncro-architecture.png" alt="Arquitectura de Zyncro en tres piezas: un cliente que habla HTTP con JSON y JWT, la API Zyncro en NestJS y Prisma con los módulos de facturas, pagos y crédito, autenticación y roles y el contrato OpenAPI, y PostgreSQL con montos decimales exactos, llaves foráneas y transacciones ACID." width="100%">
+
+Cualquier cliente que hable HTTP (tu ERP, un frontend o un script) usa la API con un token JWT. Los errores llegan como `application/problem+json`. Por dentro, la arquitectura es hexagonal (puertos y adaptadores): las reglas de negocio viven en un dominio puro, sin NestJS ni Prisma, y PostgreSQL guarda cada monto como decimal exacto. Ver [Arquitectura](docs/tecnica/01-arquitectura.md).
+
+---
+
+## 🚀 Requisitos
+
+| Herramienta | Versión | Para qué |
+|---|---|---|
+| Node.js | 22 LTS o superior | Ejecutar la API y los tests |
+| npm | La que trae Node | Dependencias (`package-lock.json`) |
+| Docker | Con Docker Compose v2 | Levantar PostgreSQL, Redis y Mailpit |
+
+---
+
+## 📦 Puesta en marcha
+
+La API corre **en tu máquina**; la infraestructura corre en contenedores. Todos los puertos se publican solo en `127.0.0.1`, así que no son accesibles desde la red.
 
 ```
 ┌──────────────── tu máquina ────────────────┐
@@ -31,19 +88,11 @@ La API corre **en tu máquina**; la infraestructura corre en contenedores con Do
 └────────────────────────────────────────────┘
 ```
 
-| Servicio   | Imagen                    | Puerto local (default)     | Para qué                                          |
-| ---------- | ------------------------- | -------------------------- | ------------------------------------------------- |
-| `postgres` | `postgres:16-alpine`      | `15432` → `5432`           | Base de datos principal (fuente de verdad)        |
-| `redis`    | `redis:7-alpine`          | `6379` → `6379`            | Rate limiting y colas de trabajos (BullMQ)        |
-| `mailpit`  | `axllent/mailpit:v1.31.3` | `1025` (SMTP), `8025` (UI) | Atrapa los mails de desarrollo; nunca los entrega |
-
-Los tres servicios tienen **healthcheck**, así que `docker compose ps` muestra `(healthy)` cuando están listos para recibir conexiones.
-
-## Puesta en marcha
-
-### 1. Instalar dependencias
+### 1. Clonar e instalar
 
 ```bash
+git clone https://github.com/dev-eduardo-gomez/zyncro-api.git
+cd zyncro-api
 npm install
 ```
 
@@ -57,87 +106,166 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-`.env` está ignorado por Git: guardá ahí tus valores locales y nunca lo commitees.
+`.env` está ignorado por Git: guarda ahí tus valores locales y nunca lo subas al repositorio.
 
-| Variable            | Obligatoria | Default | Uso                                  |
-| ------------------- | ----------- | ------- | ------------------------------------ |
-| `POSTGRES_DB`       | Sí          | —       | Nombre de la base de datos           |
-| `POSTGRES_USER`     | Sí          | —       | Usuario de PostgreSQL                |
-| `POSTGRES_PASSWORD` | Sí          | —       | Contraseña de PostgreSQL             |
-| `POSTGRES_PORT`     | No          | `15432` | Puerto de PostgreSQL en tu máquina   |
-| `REDIS_PORT`        | No          | `6379`  | Puerto de Redis en tu máquina        |
-| `MAILPIT_SMTP_PORT` | No          | `1025`  | Puerto SMTP de Mailpit en tu máquina |
-| `MAILPIT_UI_PORT`   | No          | `8025`  | Puerto de la UI web de Mailpit       |
+| Variable | Obligatoria | Default | Uso |
+|---|---|---|---|
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Sí | — | Base de datos que crea Docker |
+| `DATABASE_URL` | Sí | — | Conexión de la API (debe coincidir con las tres anteriores y con `POSTGRES_PORT`) |
+| `JWT_SECRET` | Sí | — | Firma de los tokens |
+| `JWT_EXPIRES_IN` | Sí | `900` en el ejemplo | Vigencia del token, en segundos |
+| `POSTGRES_PORT` | No | `15432` | Puerto de PostgreSQL en tu máquina |
+| `REDIS_PORT` | No | `6379` | Puerto de Redis en tu máquina |
+| `MAILPIT_SMTP_PORT` / `MAILPIT_UI_PORT` | No | `1025` / `8025` | Puertos de Mailpit |
+| `PORT` | No | `3000` | Puerto HTTP de la API |
+| `OBSERVE_APP_KEY` / `OBSERVE_APP_SECRET` | No | — | Telemetría con NestJS Observe; van juntas o ninguna |
 
-> La sintaxis es `CLAVE=valor`. Si un puerto choca con algo que ya tenés instalado (por ejemplo, un PostgreSQL local en `5432`), cambiá solo el valor en tu `.env`.
+> La API valida su configuración al arrancar: si falta `DATABASE_URL`, `JWT_SECRET` o `JWT_EXPIRES_IN`, se detiene con un error que dice cuál.
 
 ### 3. Levantar la infraestructura
 
 ```bash
 docker compose up -d --wait
-docker compose ps
+docker compose ps        # los tres servicios deben decir "Up (healthy)"
 ```
 
-`--wait` hace que el comando espere a que los healthchecks pasen. Los tres servicios deben decir `Up (healthy)`.
-
-### 4. Verificar cada servicio
+### 4. Preparar la base de datos
 
 ```bash
-# PostgreSQL: debe responder "accepting connections"
-docker compose exec postgres sh -c 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
-
-# Redis: debe responder PONG
-docker compose exec redis redis-cli ping
-
-# Mailpit: abrí la bandeja en el navegador
-# http://127.0.0.1:8025
+npx prisma migrate dev   # aplica las migraciones
+npx prisma generate      # genera el cliente en src/generated/prisma
 ```
 
-### 5. Levantar la API
+### 5. Crear tu primer usuario
+
+Todavía no hay un endpoint para administrar usuarios (#21), así que el primero se crea a mano. Los pasos están en [`bruno/README.md`](bruno/README.md#creating-a-user-to-log-in-with).
+
+### 6. Levantar la API
 
 ```bash
 npm run start:dev
 ```
 
-## Comandos de infraestructura
-
-| Comando                             | Qué hace                                                                  |
-| ----------------------------------- | ------------------------------------------------------------------------- |
-| `docker compose up -d`              | Levanta todos los servicios en segundo plano                              |
-| `docker compose up -d <servicio>`   | Levanta solo uno (`postgres`, `redis`, `mailpit`)                         |
-| `docker compose ps`                 | Muestra el estado y el healthcheck de cada servicio                       |
-| `docker compose logs -f <servicio>` | Sigue los logs de un servicio                                             |
-| `docker compose stop`               | Detiene los contenedores sin borrarlos                                    |
-| `docker compose down`               | Borra los contenedores; **los datos de PostgreSQL se conservan**          |
-| `docker compose down -v`            | Borra contenedores **y volúmenes**: ⚠️ se pierden los datos de PostgreSQL |
-
-**Persistencia:** solo PostgreSQL usa un volumen (`postgres_data`). Redis y Mailpit guardan datos efímeros, que se pierden al recrear sus contenedores.
-
-## Tests
+La API queda en `http://localhost:3000`. Para comprobarlo:
 
 ```bash
-npm test             # tests unitarios y de contrato
-npm run test:watch   # modo watch
-npm run test:cov     # cobertura
-npm run test:e2e     # tests end-to-end
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"tu@correo.com","password":"tu-contraseña"}'
 ```
 
-`test/local-infrastructure.spec.ts` contiene los **tests de contrato** de la infraestructura: leen la configuración resuelta con `docker compose --env-file .env.example config` y verifican imágenes, puertos (solo en `127.0.0.1`), volúmenes y healthchecks. Necesitan el CLI de Docker disponible, pero no requieren los contenedores levantados ni tu `.env`.
+---
 
-## Otros comandos
+## 📚 API
 
-| Comando              | Qué hace                   |
-| -------------------- | -------------------------- |
-| `npm run build`      | Compila a `dist/`          |
-| `npm run start:prod` | Ejecuta la build compilada |
-| `npm run lint`       | Lint con oxlint            |
-| `npm run format`     | Formatea con Prettier      |
+Zyncro sigue un enfoque de **contrato primero**: [`contracts/openapi.yaml`](contracts/openapi.yaml) es la fuente de verdad, y cada respuesta de los tests e2e se valida contra él. La API no expone Swagger UI. Para explorarla:
 
-## Problemas frecuentes
+- `npm run contract:docs` genera `api-docs.html`, una página interactiva con todas las operaciones, esquemas y ejemplos.
+- La colección de [Bruno](https://www.usebruno.com/) en [`bruno/`](bruno/) trae una solicitud lista por endpoint.
+- Puedes abrir el contrato en cualquier visor de OpenAPI.
 
-| Síntoma                                        | Causa probable                                                                                   | Solución                                                         |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| `bind: ... address already in use` al levantar | El puerto ya está ocupado en tu máquina                                                          | Cambiá el puerto en `.env` (`POSTGRES_PORT`, `REDIS_PORT`, etc.) |
-| Cambiar un valor en `.env` no tiene efecto     | Sintaxis `CLAVE:valor` en vez de `CLAVE=valor`, o una variable exportada en tu shell que lo pisa | Usá `=`; revisá las variables de tu shell                        |
-| Un servicio queda en `(health: starting)`      | Todavía está arrancando                                                                          | Esperá unos segundos y volvé a correr `docker compose ps`        |
-| Un servicio queda `(unhealthy)`                | El healthcheck falla                                                                             | `docker compose logs <servicio>`                                 |
+| Método | Ruta | Descripción |
+|---|---|---|
+| `POST` | `/auth/login` | Inicia sesión y devuelve un token Bearer (ruta pública) |
+| `GET` | `/auth/me` | Devuelve el usuario del token (id, email, rol) |
+| `POST` | `/customers` | Registra un cliente; un identificador fiscal repetido responde `409` |
+| `GET` | `/customers` | Lista los clientes |
+| `GET` · `PATCH` | `/customers/{customerId}` | Consulta o actualiza un cliente |
+| `POST` | `/invoices` | Emite una factura con sus partidas, impuestos, folio y vencimiento |
+| `GET` | `/invoices/{invoiceId}` | Consulta una factura con su saldo y su estado |
+| `POST` | `/invoices/{invoiceId}/payments` | Registra un pago: parcial, completo o con sobrepago; `409` si la factura está cancelada |
+| `GET` | `/invoices/{invoiceId}/payments` | Lista los pagos de una factura, del más antiguo al más reciente |
+| `GET` | `/invoices` | Lista facturas, de la más nueva a la más antigua, con filtros combinables (estado, cliente, vencimiento, monto) y paginación por cursor |
+
+Los errores responden como `application/problem+json`, y su `type` enlaza a la explicación de cada error en [`docs/errors.md`](docs/errors.md). Detalle completo en [API HTTP y seguridad](docs/tecnica/03-api-http.md).
+
+---
+
+## 🧪 Tests
+
+| Comando | Qué corre | Necesita |
+|---|---|---|
+| `npm test` | Unit: dominio, casos de uso y configuración de Docker Compose | CLI de Docker |
+| `npm run test:int` | Integración de los repositorios con PostgreSQL real | Infraestructura arriba y migraciones aplicadas |
+| `npm run test:e2e` | La API completa por HTTP, validada contra el contrato | Infraestructura arriba y `.env` completo |
+| `npm run test:cov` | Unit con cobertura | — |
+| `npm run lint` | oxlint | — |
+| `npm run contract:lint` | Valida `contracts/openapi.yaml` | — |
+| `npm run contract:docs` | Genera `api-docs.html` desde el contrato (ignorado por Git) | — |
+
+Más detalle en [Testing y calidad](docs/tecnica/05-testing-y-calidad.md).
+
+---
+
+## 🧰 Comandos útiles
+
+| Comando | Qué hace |
+|---|---|
+| `npm run start:dev` | API en modo desarrollo (recarga al guardar) |
+| `npm run build` · `npm run start:prod` | Compila a `dist/` y ejecuta la build |
+| `docker compose up -d <servicio>` | Levanta solo `postgres`, `redis` o `mailpit` |
+| `docker compose logs -f <servicio>` | Sigue los logs de un servicio |
+| `docker compose stop` | Detiene los contenedores sin borrarlos |
+| `docker compose down` | Borra los contenedores; **los datos de PostgreSQL se conservan** |
+| `docker compose down -v` | Borra contenedores **y volúmenes**: ⚠️ se pierden los datos de PostgreSQL |
+| `npx prisma studio` | Explorador visual de la base de datos |
+
+Solo PostgreSQL usa un volumen (`postgres_data`). Redis y Mailpit guardan datos efímeros. Hoy la API usa solo PostgreSQL; Redis y Mailpit quedan listos para el límite de peticiones y los recordatorios.
+
+---
+
+## 🗺️ Roadmap de la versión 1
+
+- [x] Infraestructura local, modelo de datos y errores estándar (#1, #2, #3)
+- [x] Autenticación JWT y roles `MAKER`, `CHECKER`, `ADMIN` (#4)
+- [x] Contrato OpenAPI como fuente de verdad (#43)
+- [x] Clientes, facturas y pagos (#5)
+- [x] Listado de facturas con filtros y paginación por cursor (#5)
+- [ ] Bitácora de auditoría inmutable (#22)
+- [ ] Administración de usuarios (#21)
+- [ ] Recordatorios de vencimiento por correo y marcado de facturas vencidas (#8)
+- [ ] Conciliación de comprobantes con OCR y revisión humana (#9)
+- [ ] Límite de peticiones con Redis (#7)
+- [ ] Contenedor detrás de Nginx y Cloudflare (#10)
+- [ ] CI/CD (#12)
+
+La versión 2 (portal de pago con Magic Link, WhatsApp, métricas, facturación fiscal CFDI 4.0, open banking) está descrita en [Qué es Zyncro](docs/que-es-zyncro.md#versión-2-integraciones-y-análisis).
+
+---
+
+## 🤝 Cómo contribuir
+
+Las contribuciones son bienvenidas: issues con errores o ideas, mejoras a la documentación y pull requests.
+
+1. Haz un fork y crea tu rama desde `dev`: `feat/<issue>-<tema>`, `fix/...` o `chore/...`.
+2. Si cambias la API, empieza por el contrato (`contracts/openapi.yaml`) y los tests; después el código.
+3. Haz commits con [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/) (`feat(invoices): ...`), con sus tests en el mismo commit.
+4. Antes del PR: `npm test`, `npm run test:int`, `npm run test:e2e`, `npm run lint` y `npx tsc --noEmit` en verde.
+5. Abre el PR contra `dev`. Si pasa de unas 400 líneas, divídelo en PRs encadenados.
+
+Las reglas completas están en [Convenciones y flujo](docs/tecnica/06-convenciones-y-flujo.md). Al enviar un pull request, aceptas que tu contribución se publique bajo la misma licencia del proyecto (AGPL-3.0).
+
+---
+
+## 🩺 Problemas frecuentes
+
+| Síntoma | Causa probable | Solución |
+|---|---|---|
+| `bind: ... address already in use` al levantar | El puerto ya está ocupado en tu máquina | Cambia el puerto en `.env` (`POSTGRES_PORT`, `REDIS_PORT`, etc.) |
+| `JWT_SECRET is not set` u otro error de configuración al arrancar | Falta una variable obligatoria en `.env` | Compara tu `.env` con `.env.example` |
+| `Can't reach database server` | La infraestructura no está arriba, o `DATABASE_URL` no coincide con `POSTGRES_PORT` | `docker compose ps` y revisa el puerto de `DATABASE_URL` |
+| Un cambio en `.env` no tiene efecto | Sintaxis `CLAVE:valor` en vez de `CLAVE=valor`, o una variable de tu shell que lo pisa | Usa `=` y revisa las variables de tu shell |
+| Un servicio queda en `(health: starting)` | Todavía está arrancando | Espera unos segundos y vuelve a correr `docker compose ps` |
+| Un servicio queda `(unhealthy)` | El healthcheck falla | `docker compose logs <servicio>` |
+
+---
+
+## 📝 Licencia
+
+Zyncro es software libre bajo la [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`).
+
+En resumen, y sin reemplazar el texto de la licencia:
+
+- ✅ Puedes usarlo, estudiarlo, modificarlo y autohospedarlo, también con fines comerciales.
+- 📤 Si distribuyes Zyncro o una versión modificada, debes publicar su código fuente bajo la misma licencia.
+- 🌐 Si ofreces una versión modificada **como servicio en red**, también debes poner su código fuente a disposición de sus usuarios. Esta es la diferencia principal con la GPL.

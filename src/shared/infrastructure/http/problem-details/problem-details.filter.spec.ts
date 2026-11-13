@@ -14,7 +14,7 @@ import { ProblemDetailsFilter } from './problem-details.filter.js';
 import { RequestValidationException } from './request-validation.exception.js';
 
 const NOW = new Date('2026-10-21T12:00:00.000Z');
-const INTERNAL_SECRET = 'postgres://admin:s3cret@db:5432/cobrix';
+const INTERNAL_SECRET = 'postgres://admin:s3cret@db:5432/zyncro';
 
 class MakerCheckerViolation extends BusinessRuleViolation {
   constructor() {
@@ -106,7 +106,7 @@ describe('ProblemDetailsFilter', () => {
       /^application\/problem\+json/,
     );
     expect(response.body).toEqual({
-      type: 'https://cobrix.io/errors/business-rule/maker-checker-violation',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#maker-checker-violation',
       title: 'Maker-checker rule violated',
       status: 403,
       detail: 'The maker cannot approve their own payment',
@@ -122,7 +122,7 @@ describe('ProblemDetailsFilter', () => {
 
     expect(response.status).toBe(422);
     expect(response.body).toMatchObject({
-      type: 'https://cobrix.io/errors/business-rule/credit-limit-exceeded',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#credit-limit-exceeded',
       title: 'Business rule violated',
       status: 422,
       detail: 'The customer exceeded the credit limit',
@@ -139,7 +139,7 @@ describe('ProblemDetailsFilter', () => {
       /^application\/problem\+json/,
     );
     expect(response.body).toEqual({
-      type: 'https://cobrix.io/errors/validation',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation',
       title: 'Request validation failed',
       status: 400,
       detail: 'The request contains invalid fields.',

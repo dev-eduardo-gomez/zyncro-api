@@ -19,7 +19,6 @@ export class CreateInvoiceDto {
 
   @IsArray()
   @ArrayMinSize(1)
-  // Validate each line item with its own rules, not just the array itself.
   @ValidateNested({ each: true })
   @Type(() => InvoiceLineItemDto)
   lineItems: InvoiceLineItemDto[];

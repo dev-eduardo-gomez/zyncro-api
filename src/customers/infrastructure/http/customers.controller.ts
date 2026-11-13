@@ -7,18 +7,15 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { CreateCustomerUseCase } from '../../application/create-customer.use-case.js';
 import { GetCustomerUseCase } from '../../application/get-customer.use-case.js';
 import { ListCustomersUseCase } from '../../application/list-customers.use-case.js';
 import { UpdateCustomerUseCase } from '../../application/update-customer.use-case.js';
-import { RolesGuard } from '../../../auth/infrastructure/security/roles.guard.js';
 import { CreateCustomerDto } from './create-customer.dto.js';
 import { UpdateCustomerDto } from './update-customer.dto.js';
 
 @Controller('customers')
-@UseGuards(RolesGuard)
 export class CustomersController {
   constructor(
     private readonly createCustomerUseCase: CreateCustomerUseCase,

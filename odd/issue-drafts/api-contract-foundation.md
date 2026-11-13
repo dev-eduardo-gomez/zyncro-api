@@ -1,5 +1,5 @@
 ## Problema
-Cobrix maneja información con implicaciones legales y fiscales: facturas, pagos y egresos. Hoy el contrato de la API está implícito en el código: ningún documento dice qué acepta y qué devuelve cada endpoint, ni qué errores produce. Si un DTO cambia por accidente, nadie se entera hasta que un cliente falla.
+Zyncro maneja información con implicaciones legales y fiscales: facturas, pagos y egresos. Hoy el contrato de la API está implícito en el código: ningún documento dice qué acepta y qué devuelve cada endpoint, ni qué errores produce. Si un DTO cambia por accidente, nadie se entera hasta que un cliente falla.
 
 ## Alcance
 - `contracts/openapi.yaml` (OpenAPI 3.1) como **fuente de verdad**. Ya está redactado e incluye `POST /auth/login` (`login`) y `GET /auth/me` (`getCurrentUser`), además de las convenciones comunes: `ProblemDetails`, `ValidationProblemDetails` y `bearerAuth`.

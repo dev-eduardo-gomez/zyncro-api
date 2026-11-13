@@ -1,0 +1,19 @@
+meta {
+  name: List payments
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/invoices/:invoiceId/payments
+  body: none
+  auth: inherit
+}
+
+params:path {
+  invoiceId: {{invoiceId}}
+}
+
+assert {
+  res.status: eq 200
+}

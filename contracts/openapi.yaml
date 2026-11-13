@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: Cobrix API
+  title: Zyncro API
   version: 0.1.0
-  summary: Accounts receivable API for Cobrix.
+  summary: Open-source accounts receivable API.
   description: |
-    Contract-first source of truth for the Cobrix HTTP API. Every endpoint is
+    Contract-first source of truth for the Zyncro HTTP API. Every endpoint is
     designed here before it is implemented, and e2e tests validate real
     responses against these schemas.
 
@@ -13,14 +13,14 @@ info:
     - Every error response uses RFC 9457 Problem Details
       (`application/problem+json`) with two extensions: `instance` and
       `timestamp`.
-    - Problem `type` values: `https://cobrix.io/errors/validation` for request
-      validation, `https://cobrix.io/errors/business-rule/{code}` for domain
-      rule violations, and `about:blank` for plain HTTP errors (401, 403,
+    - Problem `type` values: `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation`
+      for request validation, `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#{code}`
+      for domain rule violations, and `about:blank` for plain HTTP errors (401, 403,
       404, 500).
     - JSON property names use camelCase; timestamps are ISO 8601 in UTC.
   license:
-    name: Proprietary
-    identifier: LicenseRef-Proprietary
+    name: GNU Affero General Public License v3.0 only
+    identifier: AGPL-3.0-only
 servers:
   - url: /
     description: Same origin as the caller (local development runs on port 3000).
@@ -53,7 +53,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginRequest'
             example:
-              email: maker@cobrix.io
+              email: maker@example.com
               password: S3cure-Passw0rd!
       responses:
         '200':
@@ -99,7 +99,7 @@ paths:
                 $ref: '#/components/schemas/AuthenticatedUser'
               example:
                 id: 8f14e45f-ceea-467f-a0e6-1b3c4d5e6f70
-                email: maker@cobrix.io
+                email: maker@example.com
                 role: MAKER
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -141,7 +141,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
               example:
-                type: https://cobrix.io/errors/business-rule/customer-duplicate-tax-id
+                type: https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#customer-duplicate-tax-id
                 title: Duplicate tax id
                 status: 409
                 detail: A customer with this taxId already exists.
@@ -271,6 +271,9 @@ paths:
       tags: [Invoices]
       operationId: listInvoices
       summary: List invoices with combinable filters
+      description: >-
+        Newest first (folio descending). Every filter is optional and they
+        combine with AND; ranges include both ends.
       parameters:
         - name: status
           in: query
@@ -283,21 +286,25 @@ paths:
             format: uuid
         - name: dueDateFrom
           in: query
+          description: Earliest due date, inclusive.
           schema:
             type: string
             format: date
         - name: dueDateTo
           in: query
+          description: Latest due date, inclusive.
           schema:
             type: string
             format: date
         - name: minAmount
           in: query
+          description: Lowest `total`, inclusive. Compared against `total`, not `balance`.
           schema:
             type: string
             pattern: '^\d+\.\d{2}$'
         - name: maxAmount
           in: query
+          description: Highest `total`, inclusive. Compared against `total`, not `balance`.
           schema:
             type: string
             pattern: '^\d+\.\d{2}$'
@@ -398,7 +405,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
               example:
-                type: https://cobrix.io/errors/business-rule/invoice-cancelled
+                type: https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#invoice-cancelled
                 title: Invoice is cancelled
                 status: 409
                 detail: Cannot register a payment on a cancelled invoice.
@@ -592,6 +599,8 @@ components:
         Overlay computed at read time, never persisted. `PARTIAL` when some but
         not all of the total has been paid; `DUE_SOON` when `PENDING` and the
         due date is within the #8 reminder window (5 days) but not yet overdue.
+        When both apply, `DUE_SOON` wins: the due date is the more urgent fact,
+        and `balance` against `total` still shows the partial payment.
         `null` when neither applies.
       enum: [PARTIAL, DUE_SOON, null]
 
@@ -735,7 +744,10 @@ components:
       additionalProperties: false
       properties:
         amount:
-          $ref: '#/components/schemas/Money'
+          type: string
+          description: Amount the customer paid, as a decimal string. Must be greater than zero; `0.00` is a validation error.
+          pattern: '^(?!0+\.00$)\d+\.\d{2}$'
+          examples: ['1160.00']
         proofUrl:
           type: string
           format: uri
@@ -776,7 +788,7 @@ components:
         type:
           type: string
           format: uri-reference
-          description: '`about:blank`, or a URI under `https://cobrix.io/errors/`.'
+          description: '`about:blank`, or a URI under `https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md`.'
         title:
           type: string
         status:
@@ -810,7 +822,7 @@ components:
           required: [errors]
           properties:
             type:
-              const: https://cobrix.io/errors/validation
+              const: https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation
             status:
               const: 400
             errors:
@@ -827,7 +839,7 @@ components:
           schema:
             $ref: '#/components/schemas/ValidationProblemDetails'
           example:
-            type: https://cobrix.io/errors/validation
+            type: https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation
             title: Request validation failed
             status: 400
             detail: The request contains invalid fields.
