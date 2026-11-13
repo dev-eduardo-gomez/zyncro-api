@@ -14,7 +14,7 @@ Describe cómo está construida la API **hoy**: qué hay implementado, dónde vi
 | Clientes (CRUD) | ✅ | #5 T1 |
 | Facturas: emisión y consulta | ✅ | #5 T2 |
 | Pagos: registro, sobrepago a crédito, listado | ✅ | #5 T3 |
-| Listado de facturas con filtros y cursor | 🚧 en curso | #5 T4 |
+| Listado de facturas con filtros y cursor | ✅ | #5 T4 |
 | Recordatorios, `OVERDUE` automático | ⏳ | #8 |
 | Bitácora de auditoría | ⏳ | #22 |
 

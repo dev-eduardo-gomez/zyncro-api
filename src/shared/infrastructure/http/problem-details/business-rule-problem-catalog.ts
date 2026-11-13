@@ -30,6 +30,6 @@ const FALLBACK: CatalogEntry = {
 };
 
 export const toBusinessRuleProblem = (code: string): BusinessRuleProblem => ({
-  type: `${PROBLEM_TYPE_BASE_URI}/business-rule/${code}`,
+  type: `${PROBLEM_TYPE_BASE_URI}#${code}`,
   ...(Object.hasOwn(CATALOG, code) ? CATALOG[code] : FALLBACK),
 });

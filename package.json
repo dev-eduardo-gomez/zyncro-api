@@ -1,10 +1,10 @@
 {
   "name": "zyncro-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "Open-source accounts receivable API: invoices, partial payments and customer credit with exact decimal money, built with NestJS, Prisma and PostgreSQL.",
   "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "build": "nest build",
@@ -21,7 +21,8 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "test:int": "vitest run --config ./vitest.config.int.ts",
-    "contract:lint": "redocly lint --format=stylish"
+    "contract:lint": "redocly lint --format=stylish",
+    "contract:docs": "redocly build-docs zyncro --output api-docs.html"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",

@@ -1,4 +1,4 @@
-# Cobrix API — Bruno collection
+# Zyncro API — Bruno collection
 
 Manual requests against a running API. The source of truth for the API is still `contracts/openapi.yaml`; this collection only mirrors the endpoints that are implemented (or being implemented) so they can be exercised by hand.
 

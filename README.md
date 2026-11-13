@@ -2,16 +2,21 @@
 
 # Zyncro API
 
-**API de cuentas por cobrar para empresas que venden a crédito.**
-Emite facturas, controla saldos, registra pagos parciales y convierte los sobrepagos en crédito a favor, con precisión al centavo.
+**El motor open source de cuentas por cobrar para empresas que venden a crédito.**
+Emite facturas, controla saldos, registra pagos parciales y convierte los sobrepagos en crédito a favor, con precisión al centavo. Autohospedable y con licencia AGPL-3.0.
+
+<img src="docs/assets/zyncro-hero.png" alt="Zyncro: el motor open source de cuentas por cobrar. Una tabla de facturas por cobrar con estados vencida, parcial, pagada y en disputa, y un aviso de sobrepago registrado como crédito a favor." width="100%">
+
+<sub>Ilustración: Zyncro es una API sin interfaz gráfica. La tabla representa un cliente que la consume.</sub>
 
 [![NestJS](https://img.shields.io/badge/NestJS_12-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL_16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI_3.1-6BA539?style=for-the-badge&logo=openapiinitiative&logoColor=white)](contracts/openapi.yaml)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-663399?style=for-the-badge)](LICENSE)
 
-[Qué es Zyncro](docs/que-es-zyncro.md) · [Documentación técnica](docs/tecnica/README.md) · [Contrato de la API](contracts/openapi.yaml)
+[Qué es Zyncro](docs/que-es-zyncro.md) · [Documentación técnica](docs/tecnica/README.md) · [Contrato de la API](contracts/openapi.yaml) · [Errores](docs/errors.md)
 
 </div>
 
@@ -43,7 +48,13 @@ Zyncro es el backend de una plataforma de cobranza B2B para **una empresa emisor
 | Tests y calidad | Vitest · Supertest · AJV · oxlint · Redocly |
 | Infraestructura local | Docker Compose: PostgreSQL, Redis y Mailpit |
 
-La arquitectura es hexagonal (puertos y adaptadores): las reglas de negocio viven en un dominio puro, sin NestJS ni Prisma. Ver [Arquitectura](docs/tecnica/01-arquitectura.md).
+---
+
+## 🏗️ Arquitectura
+
+<img src="docs/assets/zyncro-architecture.png" alt="Arquitectura de Zyncro en tres piezas: un cliente que habla HTTP con JSON y JWT, la API Zyncro en NestJS y Prisma con los módulos de facturas, pagos y crédito, autenticación y roles y el contrato OpenAPI, y PostgreSQL con montos decimales exactos, llaves foráneas y transacciones ACID." width="100%">
+
+Cualquier cliente que hable HTTP (tu ERP, un frontend o un script) usa la API con un token JWT. Los errores llegan como `application/problem+json`. Por dentro, la arquitectura es hexagonal (puertos y adaptadores): las reglas de negocio viven en un dominio puro, sin NestJS ni Prisma, y PostgreSQL guarda cada monto como decimal exacto. Ver [Arquitectura](docs/tecnica/01-arquitectura.md).
 
 ---
 
@@ -147,7 +158,11 @@ curl -X POST http://localhost:3000/auth/login \
 
 ## 📚 API
 
-Zyncro sigue un enfoque de **contrato primero**: [`contracts/openapi.yaml`](contracts/openapi.yaml) es la fuente de verdad, y cada respuesta de los tests e2e se valida contra él. La API no expone Swagger UI; para explorarla puedes abrir el contrato en cualquier visor de OpenAPI o usar la colección de [Bruno](https://www.usebruno.com/) en [`bruno/`](bruno/).
+Zyncro sigue un enfoque de **contrato primero**: [`contracts/openapi.yaml`](contracts/openapi.yaml) es la fuente de verdad, y cada respuesta de los tests e2e se valida contra él. La API no expone Swagger UI. Para explorarla:
+
+- `npm run contract:docs` genera `api-docs.html`, una página interactiva con todas las operaciones, esquemas y ejemplos.
+- La colección de [Bruno](https://www.usebruno.com/) en [`bruno/`](bruno/) trae una solicitud lista por endpoint.
+- Puedes abrir el contrato en cualquier visor de OpenAPI.
 
 | Método | Ruta | Descripción |
 |---|---|---|
@@ -160,9 +175,9 @@ Zyncro sigue un enfoque de **contrato primero**: [`contracts/openapi.yaml`](cont
 | `GET` | `/invoices/{invoiceId}` | Consulta una factura con su saldo y su estado |
 | `POST` | `/invoices/{invoiceId}/payments` | Registra un pago: parcial, completo o con sobrepago; `409` si la factura está cancelada |
 | `GET` | `/invoices/{invoiceId}/payments` | Lista los pagos de una factura, del más antiguo al más reciente |
-| `GET` | `/invoices` | 🚧 Listado con filtros y paginación por cursor (en construcción) |
+| `GET` | `/invoices` | Lista facturas, de la más nueva a la más antigua, con filtros combinables (estado, cliente, vencimiento, monto) y paginación por cursor |
 
-Los errores responden como `application/problem+json`. Detalle completo en [API HTTP y seguridad](docs/tecnica/03-api-http.md).
+Los errores responden como `application/problem+json`, y su `type` enlaza a la explicación de cada error en [`docs/errors.md`](docs/errors.md). Detalle completo en [API HTTP y seguridad](docs/tecnica/03-api-http.md).
 
 ---
 
@@ -176,6 +191,7 @@ Los errores responden como `application/problem+json`. Detalle completo en [API 
 | `npm run test:cov` | Unit con cobertura | — |
 | `npm run lint` | oxlint | — |
 | `npm run contract:lint` | Valida `contracts/openapi.yaml` | — |
+| `npm run contract:docs` | Genera `api-docs.html` desde el contrato (ignorado por Git) | — |
 
 Más detalle en [Testing y calidad](docs/tecnica/05-testing-y-calidad.md).
 
@@ -204,7 +220,7 @@ Solo PostgreSQL usa un volumen (`postgres_data`). Redis y Mailpit guardan datos 
 - [x] Autenticación JWT y roles `MAKER`, `CHECKER`, `ADMIN` (#4)
 - [x] Contrato OpenAPI como fuente de verdad (#43)
 - [x] Clientes, facturas y pagos (#5)
-- [ ] Listado de facturas con filtros y paginación por cursor (#5)
+- [x] Listado de facturas con filtros y paginación por cursor (#5)
 - [ ] Bitácora de auditoría inmutable (#22)
 - [ ] Administración de usuarios (#21)
 - [ ] Recordatorios de vencimiento por correo y marcado de facturas vencidas (#8)
@@ -219,13 +235,15 @@ La versión 2 (portal de pago con Magic Link, WhatsApp, métricas, facturación 
 
 ## 🤝 Cómo contribuir
 
-1. Crea tu rama desde `dev`: `feat/<issue>-<tema>`, `fix/...` o `chore/...`.
+Las contribuciones son bienvenidas: issues con errores o ideas, mejoras a la documentación y pull requests.
+
+1. Haz un fork y crea tu rama desde `dev`: `feat/<issue>-<tema>`, `fix/...` o `chore/...`.
 2. Si cambias la API, empieza por el contrato (`contracts/openapi.yaml`) y los tests; después el código.
 3. Haz commits con [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/) (`feat(invoices): ...`), con sus tests en el mismo commit.
 4. Antes del PR: `npm test`, `npm run test:int`, `npm run test:e2e`, `npm run lint` y `npx tsc --noEmit` en verde.
 5. Abre el PR contra `dev`. Si pasa de unas 400 líneas, divídelo en PRs encadenados.
 
-Las reglas completas están en [Convenciones y flujo](docs/tecnica/06-convenciones-y-flujo.md).
+Las reglas completas están en [Convenciones y flujo](docs/tecnica/06-convenciones-y-flujo.md). Al enviar un pull request, aceptas que tu contribución se publique bajo la misma licencia del proyecto (AGPL-3.0).
 
 ---
 
@@ -244,4 +262,10 @@ Las reglas completas están en [Convenciones y flujo](docs/tecnica/06-convencion
 
 ## 📝 Licencia
 
-Todavía no se ha definido una licencia (`package.json` declara `UNLICENSED`). Hasta que se publique una, todos los derechos quedan reservados por su autor.
+Zyncro es software libre bajo la [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`).
+
+En resumen, y sin reemplazar el texto de la licencia:
+
+- ✅ Puedes usarlo, estudiarlo, modificarlo y autohospedarlo, también con fines comerciales.
+- 📤 Si distribuyes Zyncro o una versión modificada, debes publicar su código fuente bajo la misma licencia.
+- 🌐 Si ofreces una versión modificada **como servicio en red**, también debes poner su código fuente a disposición de sus usuarios. Esta es la diferencia principal con la GPL.

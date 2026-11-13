@@ -5,16 +5,16 @@ import { existsSync } from 'node:fs';
 import { AppModule } from '../src/app.module.js';
 import {
   assertMatchesContract,
-  cobrixContract,
+  zyncroContract,
 } from './contract/openapi-contract.js';
 
 if (existsSync('.env')) process.loadEnvFile();
 
-const protectedOperations = cobrixContract
+const protectedOperations = zyncroContract
   .operations()
   .filter((operation) => operation.requiresAuth);
 
-const publicOperations = cobrixContract
+const publicOperations = zyncroContract
   .operations()
   .filter((operation) => !operation.requiresAuth);
 

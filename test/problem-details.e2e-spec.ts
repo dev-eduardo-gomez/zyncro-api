@@ -94,7 +94,7 @@ describe('Problem Details (e2e)', () => {
     expect(response.status).toBe(400);
     expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     expect(response.body).toMatchObject({
-      type: 'https://cobrix.io/errors/validation',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#validation',
       status: 400,
       instance: '/e2e-probe/invoices',
     });
@@ -124,7 +124,7 @@ describe('Problem Details (e2e)', () => {
     expect(response.status).toBe(403);
     expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     expect(response.body).toMatchObject({
-      type: 'https://cobrix.io/errors/business-rule/maker-checker-violation',
+      type: 'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#maker-checker-violation',
       status: 403,
       detail: 'The maker cannot approve their own payment',
     });

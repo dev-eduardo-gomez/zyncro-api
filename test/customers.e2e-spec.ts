@@ -100,7 +100,7 @@ describe('Customers (e2e)', () => {
     expect(response.status).toBe(409);
     expect(response.headers['content-type']).toMatch(PROBLEM_JSON);
     expect(response.body.type).toBe(
-      'https://cobrix.io/errors/business-rule/customer-duplicate-tax-id',
+      'https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#customer-duplicate-tax-id',
     );
   });
 

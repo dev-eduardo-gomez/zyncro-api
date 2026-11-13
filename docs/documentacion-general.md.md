@@ -1,5 +1,5 @@
-# Archivo: cobrix-documentacion-general.md
-# Documentación General de Producto, Estrategia y Funcionalidades: Cobrix
+# Archivo: zyncro-documentacion-general.md
+# Documentación General de Producto, Estrategia y Funcionalidades: Zyncro
 
 ## 1. Misión, Visión y Objetivos Estratégicos
 
@@ -8,7 +8,7 @@
 * **Visión:** Posicionarse como el estándar tecnológico líder en automatización operativa financiera y conciliación bancaria inteligente para empresas en crecimiento.
 
 ## 2. Resumen Ejecutivo del Producto
-Cobrix es un ERP financiero enfocado en la automatización de **Cuentas por Cobrar (AR)**, **Cuentas por Pagar (AP)** y **Nómina**. Su núcleo combina motor de colas en segundo plano, integraciones bancarias mediante Webhooks/WebSockets y un pipeline de extracción OCR impulsado por Inteligencia Artificial para conciliar pagos de forma autónoma.
+Zyncro es un ERP financiero enfocado en la automatización de **Cuentas por Cobrar (AR)**, **Cuentas por Pagar (AP)** y **Nómina**. Su núcleo combina motor de colas en segundo plano, integraciones bancarias mediante Webhooks/WebSockets y un pipeline de extracción OCR impulsado por Inteligencia Artificial para conciliar pagos de forma autónoma.
 
 ## 3. Funcionalidades Concretas del ERP
 

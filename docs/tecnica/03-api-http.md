@@ -13,12 +13,27 @@ El contrato `contracts/openapi.yaml` (OpenAPI 3.1) es la fuente de verdad: **una
 | GET | `/customers/{customerId}` | Obtiene un cliente | 200 | 404 |
 | PATCH | `/customers/{customerId}` | Actualiza un cliente | 200 | 404 |
 | POST | `/invoices` | Emite una factura con sus partidas | 201 | 404 cliente inexistente |
-| GET | `/invoices` | Lista con filtros y cursor | 200 | — (T4, en curso) |
+| GET | `/invoices` | Lista con filtros y cursor | 200 | 400 filtro o cursor inválido |
 | GET | `/invoices/{invoiceId}` | Obtiene una factura | 200 | 404 |
 | POST | `/invoices/{invoiceId}/payments` | Registra un pago | 201 | 404, 409 factura cancelada |
 | GET | `/invoices/{invoiceId}/payments` | Lista pagos, del más antiguo al más reciente | 200 | 404 |
 
 Todas las rutas responden además **400** cuando la validación falla y **401** sin token o con un token inválido, salvo `/auth/login`, que es pública.
+
+### Listado de facturas
+
+`GET /invoices` devuelve `{ items, nextCursor }`, de la factura más nueva a la más antigua (folio descendente).
+
+| Parámetro | Formato | Notas |
+|---|---|---|
+| `status` | `PENDING`, `PAID`, `OVERDUE`, `CANCELLED`, `DISPUTED` | Estado guardado |
+| `customerId` | UUID | |
+| `dueDateFrom` · `dueDateTo` | `YYYY-MM-DD` | Incluyen ambos extremos |
+| `minAmount` · `maxAmount` | Texto decimal, `^d+.d{2}$` | Comparan contra `total`, incluyen ambos extremos |
+| `limit` | Entero de 1 a 100 | 20 si no se envía |
+| `cursor` | El `nextCursor` de la página anterior | Opaco: base64url de `{ folio }` |
+
+Los filtros se combinan con AND. `nextCursor` es `null` en la última página. Un cursor mal formado responde 400 antes de llegar a la base de datos.
 
 ## Autenticación y autorización
 
@@ -63,11 +78,11 @@ new ValidationPipe({
 
 ## Errores: Problem Details (RFC 9457)
 
-Todas las respuestas de error son `application/problem+json`. Las genera `ProblemDetailsFilter` (`src/shared/infrastructure/http/problem-details/`), que atrapa cualquier excepción.
+Todas las respuestas de error son `application/problem+json`. Las genera `ProblemDetailsFilter` (`src/shared/infrastructure/http/problem-details/`), que atrapa cualquier excepción. El `type` apunta a una sección de [`docs/errors.md`](../errors.md) (`PROBLEM_TYPE_BASE_URI`), que explica cada error y cómo resolverlo.
 
 ```json
 {
-  "type": "https://cobrix.io/errors/business-rule/invoice-cancelled",
+  "type": "https://github.com/dev-eduardo-gomez/zyncro-api/blob/main/docs/errors.md#invoice-cancelled",
   "title": "Invoice is cancelled",
   "status": 409,
   "detail": "Cannot register a payment on a cancelled invoice.",
@@ -78,8 +93,8 @@ Todas las respuestas de error son `application/problem+json`. Las genera `Proble
 
 | Excepción | `type` | `status` | Extra |
 |---|---|---|---|
-| `BusinessRuleViolation` (dominio) | `…/business-rule/<code>` | Según el catálogo | `detail` = mensaje del error |
-| `RequestValidationException` (pipe) | `…/validation` | 400 | `errors: [{ field, detail }]` |
+| `BusinessRuleViolation` (dominio) | `…/errors.md#<code>` | Según el catálogo | `detail` = mensaje del error |
+| `RequestValidationException` (pipe) | `…/errors.md#validation` | 400 | `errors: [{ field, detail }]` |
 | `HttpException` < 500 (`NotFoundException`, etc.) | `about:blank` | La de la excepción | — |
 | Cualquier otra | `about:blank` | 500 | Se registra en el log; `detail` genérico, sin filtrar detalles internos |
 

@@ -58,7 +58,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
 
     if (exception instanceof RequestValidationException) {
       return {
-        type: `${PROBLEM_TYPE_BASE_URI}/validation`,
+        type: `${PROBLEM_TYPE_BASE_URI}#validation`,
         title: 'Request validation failed',
         status: exception.getStatus(),
         detail: exception.message,

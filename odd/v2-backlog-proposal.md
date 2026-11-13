@@ -1,4 +1,4 @@
-# Propuesta de backlog V2 (derivada de `ERP Cobrix v1.pen`)
+# Propuesta de backlog V2 (derivada del diseño v1 en Pencil)
 
 Estado: PUBLICADO el 2026-10-28 como #18–#33 (prefijo [V2], milestone "Versión 2"). V2-n = #(17+n). 2026-10-28: #18–#29 y #32 se reasignaron a "Versión 1" (vistas V3); en V2 quedan #30, #31 y #33.
 Fuente: las 16 vistas del diseño original. V1 = issues #1–#13 (lo que define la API hoy).
