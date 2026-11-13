@@ -271,6 +271,9 @@ paths:
       tags: [Invoices]
       operationId: listInvoices
       summary: List invoices with combinable filters
+      description: >-
+        Newest first (folio descending). Every filter is optional and they
+        combine with AND; ranges include both ends.
       parameters:
         - name: status
           in: query
@@ -283,21 +286,25 @@ paths:
             format: uuid
         - name: dueDateFrom
           in: query
+          description: Earliest due date, inclusive.
           schema:
             type: string
             format: date
         - name: dueDateTo
           in: query
+          description: Latest due date, inclusive.
           schema:
             type: string
             format: date
         - name: minAmount
           in: query
+          description: Lowest `total`, inclusive. Compared against `total`, not `balance`.
           schema:
             type: string
             pattern: '^\d+\.\d{2}$'
         - name: maxAmount
           in: query
+          description: Highest `total`, inclusive. Compared against `total`, not `balance`.
           schema:
             type: string
             pattern: '^\d+\.\d{2}$'

@@ -8,6 +8,7 @@ import { CreateInvoiceUseCase } from './application/create-invoice.use-case.js';
 import { GetInvoiceUseCase } from './application/get-invoice.use-case.js';
 import { RegisterPaymentUseCase } from './application/register-payment.use-case.js';
 import { ListInvoicePaymentsUseCase } from './application/list-invoice-payments.use-case.js';
+import { ListInvoicesUseCase } from './application/list-invoices.use-case.js';
 import { PaymentRepository } from './domain/ports/payment-repository.js';
 import { PrismaPaymentRepository } from './infrastructure/persistence/prisma-payment-repository.js';
 
@@ -19,6 +20,7 @@ import { PrismaPaymentRepository } from './infrastructure/persistence/prisma-pay
     GetInvoiceUseCase,
     RegisterPaymentUseCase,
     ListInvoicePaymentsUseCase,
+    ListInvoicesUseCase,
     {
       provide: InvoiceRepository,
       useClass: PrismaInvoiceRepository,
