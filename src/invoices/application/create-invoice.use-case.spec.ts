@@ -6,6 +6,7 @@ import { InvoiceRepository } from '../domain/ports/invoice-repository.js';
 import type {
   CreateInvoiceRequest,
   Invoice,
+  InvoicePage,
   NewInvoice,
 } from '../domain/models/invoice.js';
 import { Clock } from '../../shared/domain/ports/clock.js';
@@ -49,6 +50,10 @@ class RecordingInvoiceRepository extends InvoiceRepository {
   }
 
   findById(): Promise<Invoice | null> {
+    throw new Error('not used by CreateInvoiceUseCase');
+  }
+
+  findPage(): Promise<InvoicePage> {
     throw new Error('not used by CreateInvoiceUseCase');
   }
 }
