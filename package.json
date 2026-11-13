@@ -1,10 +1,10 @@
 {
   "name": "zyncro-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "Open-source accounts receivable API: invoices, partial payments and customer credit with exact decimal money, built with NestJS, Prisma and PostgreSQL.",
   "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "build": "nest build",

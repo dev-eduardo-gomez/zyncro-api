@@ -19,8 +19,8 @@ info:
       404, 500).
     - JSON property names use camelCase; timestamps are ISO 8601 in UTC.
   license:
-    name: Proprietary
-    identifier: LicenseRef-Proprietary
+    name: GNU Affero General Public License v3.0 only
+    identifier: AGPL-3.0-only
 servers:
   - url: /
     description: Same origin as the caller (local development runs on port 3000).
